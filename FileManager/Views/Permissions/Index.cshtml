@@ -1,0 +1,79 @@
+﻿@model IEnumerable<DB_Project.DataBase.Models.Permission>
+
+@{
+    ViewBag.Title = "Permissions";
+}
+
+<h2>Permissions</h2>
+
+<p>
+    @Ajax.ActionLink("New Permission", "RenderCreate", null,
+    new AjaxOptions
+    {
+        AllowCache = false,
+        HttpMethod = "POST",
+        InsertionMode = InsertionMode.ReplaceWith,
+        UpdateTargetId = "ModalDiv",
+        OnFailure = "AjaxFailed",
+        OnBegin = "AjaxBegin",
+        OnComplete = "AjaxCompleted"
+    }, new { @class = "btn btn-primary" })
+</p>
+<div id="mainTableDiv">
+    @Html.Partial("MainTable", Model)
+</div>
+<div id="ModalDiv" class="modal fade"></div>
+@section scripts{
+    <script>
+        function AjaxCompleted() {
+            $.LoadingOverlay("hide");
+            setTimeout(() => {
+                $("#ModalDiv").modal("show");
+            }, 500);
+        }
+        function AjaxFailed() {
+            $.notify({
+                message: 'Error Occured.. Please Reload Page and Try Again ..'
+            }, { type: 'danger' });
+        }
+        function AjaxBegin() {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fa fa-spinner fa-spin"
+            });
+        }
+        // ===============Create Functions================== //
+        function SendingDataStarted() {
+            $.LoadingOverlay("show", {
+                fade: [1000, 1000],
+                image: "",
+                fontawesome: "fa fa-spinner fa-spin"
+            });
+        }
+        function DataSaved() {
+            $.notify({
+                message: 'Data Saved Successfully ..'
+            }, { type: 'success' });
+        }
+        function DataSaveFailed() {
+            $.notify({
+                message: 'Error Occured.. Please Reload Page and Try Again ..'
+            }, { type: 'danger' });
+        }
+        function DataSent() {
+            $.LoadingOverlay("hide");
+            $("#ModalDiv").modal("hide");
+            $("#table").DataTable({ "aaSorting": [] });
+        }
+        // ================================================= //
+        $.LoadingOverlay("show", {
+            fade: [1000, 1000],
+            image: "",
+            fontawesome: "fa fa-spinner fa-spin"
+        });
+        $(function () {
+            $.LoadingOverlay("hide");
+            $("#table").DataTable({ "aaSorting": [] });
+        });
+    </script>
+}

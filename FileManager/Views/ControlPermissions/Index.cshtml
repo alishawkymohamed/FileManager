@@ -1,0 +1,21 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-offset-3 col-sm-6">
+            @Html.DropDownList("UserID",(ViewBag.Users as SelectList),new { @class="form-control"})
+        </div>
+    </div>
+    <div class="row">
+        <table>
+            <thead>
+                <tr>
+
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>

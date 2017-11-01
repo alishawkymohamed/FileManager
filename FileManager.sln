@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileManager", "FileManager\FileManager.csproj", "{7A1C6794-2B1D-4BC4-8D75-23A1BB31AFC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "elFinder.Net", "elFinder.Net\elFinder.Net.csproj", "{EE8DA138-7EDA-4EB5-B3FD-377763D5EAAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB-Project", "DB-Project\DB-Project.csproj", "{F621DE68-8A37-4FD9-9EEA-1566016F63FF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7A1C6794-2B1D-4BC4-8D75-23A1BB31AFC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A1C6794-2B1D-4BC4-8D75-23A1BB31AFC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A1C6794-2B1D-4BC4-8D75-23A1BB31AFC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A1C6794-2B1D-4BC4-8D75-23A1BB31AFC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE8DA138-7EDA-4EB5-B3FD-377763D5EAAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE8DA138-7EDA-4EB5-B3FD-377763D5EAAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE8DA138-7EDA-4EB5-B3FD-377763D5EAAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE8DA138-7EDA-4EB5-B3FD-377763D5EAAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F621DE68-8A37-4FD9-9EEA-1566016F63FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F621DE68-8A37-4FD9-9EEA-1566016F63FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F621DE68-8A37-4FD9-9EEA-1566016F63FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F621DE68-8A37-4FD9-9EEA-1566016F63FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
