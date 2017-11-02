@@ -578,6 +578,7 @@
     <Content Include="Views\Permissions\Index.cshtml" />
     <Content Include="Views\Permissions\MainTable.cshtml" />
     <Content Include="Views\ControlPermissions\Index.cshtml" />
+    <Content Include="Views\ControlPermissions\mainTable.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

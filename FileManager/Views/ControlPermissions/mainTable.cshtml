@@ -1,0 +1,34 @@
+﻿@model IEnumerable<DB_Project.DataBase.Models.Content>
+
+<div class="row">
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th></th>
+                @foreach (var Permission in (ViewBag.Permissions as IEnumerable<DB_Project.DataBase.Models.Permission>))
+                {
+                    <th class="text-center">@Permission.Name</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var Content in Model)
+            {
+                <tr>
+                    <td id="@Content.ID">
+                        <span>@Content.Name</span>&nbsp;&nbsp;<span>(&nbsp;@(Content.Path.Replace("E:\\FileManager\\FileManager\\Content\\Files", "~"))&nbsp;)</span>
+                    </td>
+                    @foreach (var Permission in (ViewBag.Permissions as IEnumerable<DB_Project.DataBase.Models.Permission>))
+                    {
+                        <td class="text-center"><input type="radio" id="@Permission.ID" name="@Content.ID" /></td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="row">
+    <div class="col-sm-offset-3 col-sm-6">
+        <input type="button" value="Save" class="btn btn-block" />
+    </div>
+</div>

@@ -1,21 +1,59 @@
-﻿
-@{
-    ViewBag.Title = "Index";
+﻿@{
+    ViewBag.Title = "Permissions";
 }
 
 <div class="container">
     <div class="row">
         <div class="col-sm-offset-3 col-sm-6">
-            @Html.DropDownList("UserID",(ViewBag.Users as SelectList),new { @class="form-control"})
+            @using (Ajax.BeginForm("GetData", "ControlPermissions", null, new AjaxOptions
+            {
+                AllowCache = false,
+                HttpMethod = "POST",
+                InsertionMode = InsertionMode.ReplaceWith,
+                OnBegin = "GettingDataStarted",
+                OnComplete = "GettingDataCompleted",
+                OnFailure = "GettingDataFailed",
+                UpdateTargetId = "mainTable"
+            }))
+            {
+                @Html.DropDownList("id", (ViewBag.Users as SelectList), new { @class = "form-control" ,id="ddlUser"})
+            }
         </div>
     </div>
-    <div class="row">
-        <table>
-            <thead>
-                <tr>
-
-                </tr>
-            </thead>
-        </table>
-    </div>
+    <br />
+    <div id="mainTable"></div>
 </div>
+@section scripts{
+    <script>
+        function GettingDataStarted() {
+            $.LoadingOverlay("show", {
+                fade: [1000, 1000],
+                image: "",
+                fontawesome: "fa fa-spinner fa-spin"
+            });
+        }
+        function GettingDataCompleted() {
+            $.LoadingOverlay("hide");
+            $("#table").DataTable({ "aaSorting": [] });
+        }
+        function GettingDataFailed() {
+            $.LoadingOverlay("hide");
+            $.notify({
+                message: 'Error Occured !! Please Reload Page and Try Again ..'
+            }, { type: 'danger' });
+        }
+        $.LoadingOverlay("show", {
+            fade: [1000, 1000],
+            image: "",
+            fontawesome: "fa fa-spinner fa-spin"
+        });
+        $(function () {
+            $.LoadingOverlay("hide");
+            $("#ddlUser").on("change", (e) => {
+                if ($("#ddlUser").val() != 0) {
+                    $("form").submit();
+                }
+            });
+        });
+    </script>
+}

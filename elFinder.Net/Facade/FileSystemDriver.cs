@@ -46,25 +46,82 @@ namespace ElFinder
             {
                 // Create the path to the new copy of the file.
                 string temppath = Path.Combine(destDirName, file.Name);
-
-                // Copy the file.
+                db.Contents.Add(new DB_Project.DataBase.Models.Content() { Name = file.Name, Path = temppath, Type = DB_Project.DataBase.Models.Type.File });
                 file.CopyTo(temppath, false);
             }
-
             // If copySubDirs is true, copy the subdirectories.
+
             if (copySubDirs)
             {
                 foreach (DirectoryInfo subdir in dirs)
                 {
                     // Create the subdirectory.
                     string temppath = Path.Combine(destDirName, subdir.Name);
-
+                    db.Contents.Add(new DB_Project.DataBase.Models.Content() { Name = subdir.Name, Path = temppath, Type = DB_Project.DataBase.Models.Type.Folder });
                     // Copy the subdirectories.
                     DirectoryCopy(subdir, temppath, copySubDirs);
                 }
             }
+            db.SaveChanges();
         }
+        private void DirectoryCut(DirectoryInfo sourceDir, string destDirName, bool cutSubDirs)
+        {
+            DirectoryInfo[] dirs = sourceDir.GetDirectories();
 
+            FileInfo[] files = sourceDir.GetFiles();
+
+            foreach (FileInfo file in files)
+            {
+                // Create the path to the new copy of the file.
+                string temppath = Path.Combine(destDirName, file.Name);
+                db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.File)
+                           .SingleOrDefault(f => f.Path == file.FullName).Path = temppath;
+            }
+            // If cutSubDirs is true, cut the subdirectories.
+
+            if (cutSubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    // Create the subdirectory.
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+                    db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.Folder)
+                               .SingleOrDefault(f => f.Path == subdir.FullName).Path = temppath;                    
+                    // cut the subdirectories.
+                    DirectoryCut(subdir, temppath, cutSubDirs);
+                }
+            }
+            db.SaveChanges();
+        }
+        private void DirectoryDelete(DirectoryInfo sourceDir, bool DeleteSubDirs)
+        {
+            DirectoryInfo[] dirs = sourceDir.GetDirectories();
+
+            FileInfo[] files = sourceDir.GetFiles();
+
+            foreach (FileInfo file in files)
+            {
+                // Delete the path of the file from Database ...
+                var tempFile = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.File)
+                           .SingleOrDefault(f => f.Path == file.FullName);
+                db.Contents.Remove(tempFile);
+            }
+            // If DeleteSubDirs is true, Delete the subdirectories.
+
+            if (DeleteSubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    // Delete the path of the SubFolders from Database ...
+                    var tempFile = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.Folder)
+                               .SingleOrDefault(f => f.Path == subdir.FullName);
+                    db.Contents.Remove(tempFile);
+                    // Delete the subdirectories.
+                    DirectoryDelete(subdir, DeleteSubDirs);
+                }
+            }
+            db.SaveChanges();
+        }
         private void RemoveThumbs(FullPath path)
         {
             if (path.Directory != null)
@@ -258,16 +315,30 @@ namespace ElFinder
             DirectoryInfo newDir = Directory.CreateDirectory(Path.Combine(fullPath.Directory.FullName, name));
             // Save in Database ....
             db.Contents.Add(new DB_Project.DataBase.Models.Content() { Name = name, Path = newDir.FullName, Type = DB_Project.DataBase.Models.Type.Folder });
-            db.SaveChanges();
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception)
+            {
+                return Error.MissedParameter("Error Occured .. Reload and Try Again Later");
+            }
             return Json(new AddResponse(newDir, fullPath.Root));
         }
         JsonResult IDriver.MakeFile(string target, string name)
         {
             FullPath fullPath = ParsePath(target);
             FileInfo newFile = new FileInfo(Path.Combine(fullPath.Directory.FullName, name));
-            newFile.Create().Close();
             db.Contents.Add(new DB_Project.DataBase.Models.Content() { Name = name, Path = newFile.FullName, Type = DB_Project.DataBase.Models.Type.File });
-            db.SaveChanges();
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception)
+            {
+                return Error.MissedParameter("Error Occured .. Reload and Try Again Later");
+            }
+            newFile.Create().Close();
             return Json(new AddResponse(newFile, fullPath.Root));
         }
         JsonResult IDriver.Rename(string target, string name)
@@ -279,12 +350,17 @@ namespace ElFinder
             if (fullPath.Directory != null)
             {
                 string newPath = Path.Combine(fullPath.Directory.Parent.FullName, name);
+                var folder = db.Contents.SingleOrDefault(f => f.Path == fullPath.Directory.FullName);
+                folder.Path = newPath; folder.Name = name;
+                db.SaveChanges();
                 System.IO.Directory.Move(fullPath.Directory.FullName, newPath);
                 answer.Added.Add(DTOBase.Create(new DirectoryInfo(newPath), fullPath.Root));
             }
             else
             {
                 string newPath = Path.Combine(fullPath.File.DirectoryName, name);
+                var file = db.Contents.SingleOrDefault(f => f.Path == fullPath.Directory.FullName);
+                file.Path = newPath; file.Name = name;
                 File.Move(fullPath.File.FullName, newPath);
                 answer.Added.Add(DTOBase.Create(new FileInfo(newPath), fullPath.Root));
             }
@@ -299,6 +375,7 @@ namespace ElFinder
                 RemoveThumbs(fullPath);
                 if (fullPath.Directory != null)
                 {
+                    DirectoryDelete(fullPath.Directory, true);
                     System.IO.Directory.Delete(fullPath.Directory.FullName, true);
                 }
                 else
@@ -333,7 +410,7 @@ namespace ElFinder
         JsonResult IDriver.Paste(string source, string dest, IEnumerable<string> targets, bool isCut)
         {
             FullPath destPath = ParsePath(dest);
-            var OldPath = ParsePath(source);
+            FullPath OldPath = ParsePath(source);
             ReplaceResponse response = new ReplaceResponse();
             foreach (var item in targets)
             {
@@ -345,11 +422,20 @@ namespace ElFinder
                         Directory.Delete(newDir.FullName, true);
                     if (isCut)
                     {
-                        RemoveThumbs(src);
-                        src.Directory.MoveTo(newDir.FullName);
+                        DirectoryCut(src.Directory, newDir.FullName, true);
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (Exception)
+                        {
+                            return Error.MissedParameter("Error Occured .. Reload and Try Again Later");
+                        }
                         var OldFolderDB = db.Contents.SingleOrDefault(f => f.Path == OldPath.Directory.FullName && f.Type == DB_Project.DataBase.Models.Type.Folder);
                         OldFolderDB.Path = newDir.FullName;
                         db.SaveChanges();
+                        RemoveThumbs(src);
+                        src.Directory.MoveTo(newDir.FullName);
                         response.Removed.Add(item);
                     }
                     else
@@ -365,17 +451,31 @@ namespace ElFinder
                         File.Delete(newFilePath);
                     if (isCut)
                     {
-                        RemoveThumbs(src);
-                        src.File.MoveTo(newFilePath);
                         var OldPathDB = db.Contents.SingleOrDefault(c => c.Path == OldPath.File.FullName && c.Type == DB_Project.DataBase.Models.Type.File);
                         OldPathDB.Path = newFilePath;
-                        db.SaveChanges();
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (Exception)
+                        {
+                            return Error.MissedParameter("Error Occured .. Reload and Try Again Later");
+                        }
+                        RemoveThumbs(src);
+                        src.File.MoveTo(newFilePath);
                         response.Removed.Add(item);
                     }
                     else
                     {
                         db.Contents.Add(new DB_Project.DataBase.Models.Content() { Type = DB_Project.DataBase.Models.Type.File, Path = newFilePath, Name = src.File.Name });
-                        db.SaveChanges();
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (Exception)
+                        {
+                            return Error.MissedParameter("Error Occured .. Reload and Try Again Later");
+                        }
                         File.Copy(src.File.FullName, newFilePath);
                     }
                     response.Added.Add(DTOBase.Create(new FileInfo(newFilePath), destPath.Root));
@@ -454,8 +554,12 @@ namespace ElFinder
                     var parentPath = fullPath.Directory.Parent.FullName;
                     var name = fullPath.Directory.Name;
                     var newName = string.Format(@"{0}\{1} copy", parentPath, name);
+                    var FolderName = string.Format(@"{0} copy", name);
+                    
                     if (!Directory.Exists(newName))
                     {
+                        db.Contents.Add(new DB_Project.DataBase.Models.Content() { Name = FolderName, Path = newName, Type = DB_Project.DataBase.Models.Type.Folder });
+                        db.SaveChanges();
                         DirectoryCopy(fullPath.Directory, newName, true);
                     }
                     else
@@ -463,8 +567,12 @@ namespace ElFinder
                         for (int i = 1; i < 100; i++)
                         {
                             newName = string.Format(@"{0}\{1} copy {2}", parentPath, name, i);
+                            FolderName = string.Format(@"{0} copy {1}", name, i);
+
                             if (!Directory.Exists(newName))
                             {
+                                db.Contents.Add(new DB_Project.DataBase.Models.Content() { Name = FolderName, Path = newName, Type = DB_Project.DataBase.Models.Type.Folder });
+                                db.SaveChanges();
                                 DirectoryCopy(fullPath.Directory, newName, true);
                                 break;
                             }
@@ -477,11 +585,12 @@ namespace ElFinder
                     var parentPath = fullPath.File.Directory.FullName;
                     var name = fullPath.File.Name.Substring(0, fullPath.File.Name.Length - fullPath.File.Extension.Length);
                     var ext = fullPath.File.Extension;
-
                     var newName = string.Format(@"{0}\{1} copy{2}", parentPath, name, ext);
-
+                    var fileName = string.Format(@"{0} copy{1}", name, ext);
                     if (!File.Exists(newName))
                     {
+                        db.Contents.Add(new DB_Project.DataBase.Models.Content() { Name = fileName, Path = newName, Type = DB_Project.DataBase.Models.Type.File });
+                        db.SaveChanges();
                         fullPath.File.CopyTo(newName);
                     }
                     else
@@ -489,8 +598,11 @@ namespace ElFinder
                         for (int i = 1; i < 100; i++)
                         {
                             newName = string.Format(@"{0}\{1} copy {2}{3}", parentPath, name, i, ext);
+                            fileName = string.Format(@"{0} copy {1}{2}", name, i, ext);
                             if (!File.Exists(newName))
                             {
+                                db.Contents.Add(new DB_Project.DataBase.Models.Content() { Name = fileName, Path = newName, Type = DB_Project.DataBase.Models.Type.File });
+                                db.SaveChanges();
                                 fullPath.File.CopyTo(newName);
                                 break;
                             }
