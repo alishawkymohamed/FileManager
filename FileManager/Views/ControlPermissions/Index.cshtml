@@ -1,7 +1,6 @@
 ﻿@{
     ViewBag.Title = "Permissions";
 }
-
 <div class="container">
     <div class="row">
         <div class="col-sm-offset-3 col-sm-6">
@@ -16,7 +15,7 @@
                 UpdateTargetId = "mainTable"
             }))
             {
-                @Html.DropDownList("id", (ViewBag.Users as SelectList), new { @class = "form-control" ,id="ddlUser"})
+                @Html.DropDownList("id", (ViewBag.Users as SelectList), new { @class = "form-control", id = "ddlUser" })
             }
         </div>
     </div>
@@ -25,16 +24,80 @@
 </div>
 @section scripts{
     <script>
+        var table;
+        $.LoadingOverlay("show", {
+            fade: [500, 500],
+            image: "",
+            fontawesome: "fa fa-spinner fa-spin"
+        });
         function GettingDataStarted() {
             $.LoadingOverlay("show", {
-                fade: [1000, 1000],
+                fade: [500, 500],
                 image: "",
                 fontawesome: "fa fa-spinner fa-spin"
             });
         }
         function GettingDataCompleted() {
+            if (table) {
+                table.destroy();
+            }
+            table = $("#table").DataTable({ "aaSorting": [] });
             $.LoadingOverlay("hide");
-            $("#table").DataTable({ "aaSorting": [] });
+            var dataToBeSent = {};
+            $("#btnSave").on("click", (e) => {
+                $.LoadingOverlay("show", {
+                    fade: [500, 500],
+                    image: "",
+                    fontawesome: "fa fa-spinner fa-spin"
+                });
+                dataToBeSent.UserId = $("#ddlUser").val();
+                dataToBeSent.PermissionsData = [];
+                for (var i = 0; i < table.$("tr").length; i++) {
+                    var Temp = {};
+                    Temp.ContentId = $(table.$("tr")[i]).attr("id");
+                    var Permissions = [];
+                    for (var j = 0; j < $(table.$("tr")[i]).find("input").length; j++) {
+                        if (($(table.$("tr")[i]).find("input")[j]).checked == true) {
+                            Permissions.push(parseInt(($(table.$("tr")[i]).find("input")[j]).id));
+                        }
+                    }
+                    Temp.Permissions = Permissions;
+                    dataToBeSent.PermissionsData.push(Temp);
+                }
+                $.ajax({
+                    url: '@Url.Action("SaveData", "ControlPermissions")',
+                    cashe: false,
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ "dataToBeSent": dataToBeSent }),
+                    success: (data) => {
+                        if (data == true) {
+                            $.LoadingOverlay("hide");
+                            $.notify({
+                                message: "Data Saved Successfully .."
+                            }, {
+                                type: "success"
+                            });
+                        }
+                        else {
+                            $.LoadingOverlay("hide");
+                            $.notify({
+                                message: "Error Occured .. Reload Page and Try Again !!"
+                            }, {
+                                type: "danger"
+                            });
+                        }
+                    },
+                    error: (e, ee, eee) => {
+                        $.LoadingOverlay("hide");
+                        $.notify({
+                            message: "Error Occured .. Reload Page and Try Again !!"
+                        }, {
+                            type: "danger"
+                        });
+                    }
+                });
+            });
         }
         function GettingDataFailed() {
             $.LoadingOverlay("hide");
@@ -42,11 +105,6 @@
                 message: 'Error Occured !! Please Reload Page and Try Again ..'
             }, { type: 'danger' });
         }
-        $.LoadingOverlay("show", {
-            fade: [1000, 1000],
-            image: "",
-            fontawesome: "fa fa-spinner fa-spin"
-        });
         $(function () {
             $.LoadingOverlay("hide");
             $("#ddlUser").on("change", (e) => {

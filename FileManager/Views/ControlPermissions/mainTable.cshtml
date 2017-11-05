@@ -1,34 +1,39 @@
-﻿@model IEnumerable<DB_Project.DataBase.Models.Content>
-
-<div class="row">
-    <table class="table table-bordered table-striped table-hover">
-        <thead>
-            <tr>
-                <th></th>
-                @foreach (var Permission in (ViewBag.Permissions as IEnumerable<DB_Project.DataBase.Models.Permission>))
-                {
-                    <th class="text-center">@Permission.Name</th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var Content in Model)
+﻿@model FileManager.Controllers.SentModel
+    <div id="mainTable">
+        <div class="row">
+            <table class="table table-bordered table-striped table-hover" id="table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Type</th>
+                        @foreach (var Permission in (ViewBag.Permissions as IEnumerable<DB_Project.DataBase.Models.Permission>))
+                        {
+                            <th class="text-center">@Permission.Name</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var Content in Model.Contents)
             {
-                <tr>
-                    <td id="@Content.ID">
-                        <span>@Content.Name</span>&nbsp;&nbsp;<span>(&nbsp;@(Content.Path.Replace("E:\\FileManager\\FileManager\\Content\\Files", "~"))&nbsp;)</span>
-                    </td>
-                    @foreach (var Permission in (ViewBag.Permissions as IEnumerable<DB_Project.DataBase.Models.Permission>))
-                    {
-                        <td class="text-center"><input type="radio" id="@Permission.ID" name="@Content.ID" /></td>
+                        <tr id="@Content.ID">
+                            <td>
+                                <span>@Content.Name</span>&nbsp;&nbsp;<span>(&nbsp;@(Content.Path.Replace((Server.MapPath("~/Content/Files")), "~"))&nbsp;)</span>
+                            </td>
+                            <td>
+                                <span>@(Content.Type == 0 ? "File" : "Folder")</span>
+                            </td>
+                            @foreach (var Permission in (ViewBag.Permissions as IEnumerable<DB_Project.DataBase.Models.Permission>))
+                            {
+                                <td class="text-center"><input type="checkbox" id="@Permission.ID" checked="@((Model.Contents.SingleOrDefault(d => d.ID == Content.ID)).UserContentPermissions.SingleOrDefault(n => n.UserID == Model.UserId && n.ContentID == Content.ID && n.PermissionID == Permission.ID))" /></td>
+                            }
+                        </tr>
                     }
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
-<div class="row">
-    <div class="col-sm-offset-3 col-sm-6">
-        <input type="button" value="Save" class="btn btn-block" />
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col-sm-offset-3 col-sm-6">
+                <input type="button" value="Save" id="btnSave" class="btn btn-block" />
+            </div>
+        </div>
     </div>
-</div>
