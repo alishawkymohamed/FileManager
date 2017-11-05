@@ -586,12 +586,12 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Permissions\P_Delete.cshtml" />
     <Content Include="Views\Permissions\Index.cshtml" />
     <Content Include="Views\Permissions\MainTable.cshtml" />
     <Content Include="Views\ControlPermissions\Index.cshtml" />
     <Content Include="Views\ControlPermissions\mainTable.cshtml" />
     <Content Include="Scripts\jquery-1.12.4.min.map" />
+    <Content Include="Views\Permissions\P_Edit.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
