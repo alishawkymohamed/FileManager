@@ -6,19 +6,6 @@
 
 <h2>Permissions</h2>
 
-<p>
-    @Ajax.ActionLink("New Permission", "RenderCreate", null,
-    new AjaxOptions
-    {
-        AllowCache = false,
-        HttpMethod = "POST",
-        InsertionMode = InsertionMode.ReplaceWith,
-        UpdateTargetId = "ModalDiv",
-        OnFailure = "AjaxFailed",
-        OnBegin = "AjaxBegin",
-        OnComplete = "AjaxCompleted"
-    }, new { @class = "btn btn-primary" })
-</p>
 <div id="mainTableDiv">
     @Html.Partial("MainTable", Model)
 </div>

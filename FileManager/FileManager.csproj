@@ -586,9 +586,7 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Permissions\P_Create.cshtml" />
     <Content Include="Views\Permissions\P_Delete.cshtml" />
-    <Content Include="Views\Permissions\P_Edit.cshtml" />
     <Content Include="Views\Permissions\Index.cshtml" />
     <Content Include="Views\Permissions\MainTable.cshtml" />
     <Content Include="Views\ControlPermissions\Index.cshtml" />

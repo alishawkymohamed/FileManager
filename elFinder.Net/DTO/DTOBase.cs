@@ -2,6 +2,7 @@
 using System.Runtime.Serialization;
 using System.IO;
 using System.Linq;
+using DB_Project.DataBase.Models;
 
 namespace ElFinder.DTO
 {
@@ -9,6 +10,7 @@ namespace ElFinder.DTO
     internal abstract class DTOBase
     {
         protected static readonly DateTime _unixOrigin = new DateTime(1970, 1, 1, 0, 0, 0);
+        private static DB_Project.DataBase.FileManager db = new DB_Project.DataBase.FileManager();
 
         /// <summary>
         ///  Name of file/dir. Required
@@ -67,6 +69,20 @@ namespace ElFinder.DTO
             string parentPath = info.Directory.FullName.Substring(root.Directory.FullName.Length);
             string relativePath = info.FullName.Substring(root.Directory.FullName.Length);
             FileDTO response;
+
+            var Files = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.File);
+            var UserId = int.Parse(System.Web.HttpContext.Current.Session["UserId"].ToString());
+            var RealPath = info.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+            var CurrentFile = Files.SingleOrDefault(f => f.Name == info.Name && f.Path == RealPath && f.Type == DB_Project.DataBase.Models.Type.File);
+            DB_Project.DataBase.Models.UserContentPermission ReadOnlyPermission = null;
+            DB_Project.DataBase.Models.UserContentPermission LockedPermission = null;
+            if (CurrentFile != null)
+            {
+                LockedPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Locked);
+                ReadOnlyPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.ReadOnly);
+            }
+
+
             if (root.CanCreateThumbnail(info))
             {
                 ImageDTO imageResponse = new ImageDTO();
@@ -80,8 +96,15 @@ namespace ElFinder.DTO
                 response = new FileDTO();
             }
             response.Read = 1;
-            response.Write = info.IsReadOnly ? (byte)0 : (byte)1;
-            response.Locked = (root.LockedFolders == null ? (byte)0 : ((root.LockedFolders.Any(f => f == info.Directory.Name) || root.IsLocked) ? (byte)1 : (byte)0));
+            response.Write = (info.IsReadOnly || ReadOnlyPermission != null) ? (byte)0 : (byte)1;
+            if (LockedPermission != null)
+            {
+                response.Locked = (byte)1;
+            }
+            else
+            {
+                response.Locked = ((root.LockedFolders == null) ? (byte)0 : ((root.LockedFolders.Any(f => f == info.Directory.Name) || root.IsLocked) ? (byte)1 : (byte)0));
+            }
             response.Name = info.Name;
             response.Size = info.Length;
             response.UnixTimeStamp = (long)(info.LastWriteTimeUtc - _unixOrigin).TotalSeconds;
@@ -97,17 +120,34 @@ namespace ElFinder.DTO
                 throw new ArgumentNullException("directory");
             if (root == null)
                 throw new ArgumentNullException("root");
+
+            var Folders = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.Folder);
+            var UserId = int.Parse(System.Web.HttpContext.Current.Session["UserId"].ToString());
+
             if (root.Directory.FullName == directory.FullName)
             {
                 bool hasSubdirs = false;
                 DirectoryInfo[] subdirs = directory.GetDirectories();
+                
                 foreach (var item in subdirs)
                 {
-                    if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
+                    var RealPath = item.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+                    var CurrentFolder = Folders.SingleOrDefault(f => f.Name == item.Name && f.Path == RealPath && f.Type == DB_Project.DataBase.Models.Type.Folder);
+                    DB_Project.DataBase.Models.UserContentPermission HiddenPermission = null;
+                    if (CurrentFolder != null)
                     {
-                        hasSubdirs = true;
-                        break;
+                        HiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
                     }
+
+                    if (HiddenPermission == null)
+                    {
+                        if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
+                        {
+                            hasSubdirs = true;
+                            break;
+                        }
+                    }
+                    
                 }
                 RootDTO response = new RootDTO()
                 {
@@ -127,14 +167,30 @@ namespace ElFinder.DTO
             else
             {
                 string parentPath = directory.Parent.FullName.Substring(root.Directory.FullName.Length);
+
+                var RealPath = directory.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+                var CurrentFolder = Folders.SingleOrDefault(f => f.Name == directory.Name && f.Path == RealPath && f.Type == DB_Project.DataBase.Models.Type.Folder);
+                DB_Project.DataBase.Models.UserContentPermission ReadOnlyPermission = null;
+                DB_Project.DataBase.Models.UserContentPermission LockedPermission = null;
+                if (CurrentFolder != null)
+                {
+                    LockedPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Locked);
+                    ReadOnlyPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.ReadOnly);
+                    if (LockedPermission != null)
+                    {
+                        root.LockedFolders = new System.Collections.Generic.List<string>();
+                        root.LockedFolders.Add(CurrentFolder.Name);
+                    }
+                }
+                
                 DirectoryDTO response = new DirectoryDTO()
                 {
                     Mime = "directory",
                     ContainsChildDirs = directory.GetDirectories().Length > 0 ? (byte)1 : (byte)0,
                     Hash = root.VolumeId + Helper.EncodePath(directory.FullName.Substring(root.Directory.FullName.Length)),
                     Read = 1,
-                    Write = root.IsReadOnly ? (byte)0 : (byte)1,
-                    Locked = (root.LockedFolders == null ? (byte)0 : ((root.LockedFolders.Any(f => f == directory.Name) || root.IsLocked) ? (byte)1 : (byte)0)),
+                    Write = (root.IsReadOnly || ReadOnlyPermission != null) ? (byte)0 : (byte)1,
+                    Locked = (root.LockedFolders == null ? (byte)0 : ((root.LockedFolders.Any(f => f == directory.Name) || root.IsLocked || LockedPermission != null) ? (byte)1 : (byte)0)),
                     Size = 0,
                     Name = directory.Name,
                     UnixTimeStamp = (long)(directory.LastWriteTimeUtc - _unixOrigin).TotalSeconds,

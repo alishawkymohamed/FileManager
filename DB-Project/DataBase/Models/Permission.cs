@@ -10,7 +10,7 @@ namespace DB_Project.DataBase.Models
     public enum Permissions
     {
         ReadOnly = 1,
-        Read, Write = 2,
+        ReadWrite = 2,
         Locked = 3,
         Hidden = 4
     }

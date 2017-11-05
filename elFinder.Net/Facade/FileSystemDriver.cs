@@ -20,8 +20,6 @@ namespace ElFinder
         private List<Root> _roots;
         private DB_Project.DataBase.FileManager db;
 
-
-
         private JsonResult Json(object data)
         {
             return new JsonDataContractResult(data) { JsonRequestBehavior = JsonRequestBehavior.AllowGet, ContentType = "text/html" };
@@ -88,8 +86,9 @@ namespace ElFinder
                 {
                     // Create the subdirectory.
                     string temppath = Path.Combine(destDirName, subdir.Name);
+                    var FullPath = subdir.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
                     db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.Folder)
-                               .SingleOrDefault(f => f.Path == subdir.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~")).Path = temppath;
+                               .SingleOrDefault(f => f.Path == FullPath).Path = temppath;
                     // cut the subdirectories.
                     DirectoryCut(subdir, temppath, cutSubDirs);
                 }
@@ -105,8 +104,9 @@ namespace ElFinder
             foreach (FileInfo file in files)
             {
                 // Delete the path of the file from Database ...
+                var FullPath = file.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
                 var tempFile = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.File)
-                           .SingleOrDefault(f => f.Path == file.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~"));
+                           .SingleOrDefault(f => f.Path == FullPath);
                 db.Contents.Remove(tempFile);
             }
             // If DeleteSubDirs is true, Delete the subdirectories.
@@ -116,8 +116,9 @@ namespace ElFinder
                 foreach (DirectoryInfo subdir in dirs)
                 {
                     // Delete the path of the SubFolders from Database ...
+                    var FullPath = subdir.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
                     var tempFile = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.Folder)
-                               .SingleOrDefault(f => f.Path == subdir.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~"));
+                               .SingleOrDefault(f => f.Path == FullPath);
                     db.Contents.Remove(tempFile);
                     // Delete the subdirectories.
                     DirectoryDelete(subdir, DeleteSubDirs);
@@ -202,15 +203,39 @@ namespace ElFinder
         {
             FullPath fullPath = ParsePath(target);
             OpenResponse answer = new OpenResponse(DTOBase.Create(fullPath.Directory, fullPath.Root), fullPath);
+            // Custom Work
+            var Files = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.File);
+            var Folders = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.Folder);
+            var UserId = int.Parse(System.Web.HttpContext.Current.Session["UserId"].ToString());
             foreach (FileInfo item in fullPath.Directory.GetFiles())
             {
-                if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
-                    answer.Files.Add(DTOBase.Create(item, fullPath.Root));
+                var RealPath = item.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+                var CurrentFile = Files.SingleOrDefault(f => f.Name == item.Name && f.Path == RealPath && f.Type == DB_Project.DataBase.Models.Type.File);
+                DB_Project.DataBase.Models.UserContentPermission HiddenPermission = null;
+                if (CurrentFile != null)
+                {
+                    HiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                }
+                if (HiddenPermission == null)
+                {
+                    if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
+                        answer.Files.Add(DTOBase.Create(item, fullPath.Root));
+                }
             }
             foreach (DirectoryInfo item in fullPath.Directory.GetDirectories())
             {
-                if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
-                    answer.Files.Add(DTOBase.Create(item, fullPath.Root));
+                var RealPath = item.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+                var CurrentFolder = Folders.SingleOrDefault(f => f.Name == item.Name && f.Path == RealPath && f.Type == DB_Project.DataBase.Models.Type.Folder);
+                DB_Project.DataBase.Models.UserContentPermission HiddenPermission = null;
+                if (CurrentFolder != null)
+                {
+                    HiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                }
+                if (HiddenPermission == null)
+                {
+                    if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
+                        answer.Files.Add(DTOBase.Create(item, fullPath.Root));
+                }
             }
             return Json(answer);
         }
@@ -377,8 +402,10 @@ namespace ElFinder
             if (fullPath.Directory != null)
             {
                 string newPath = Path.Combine(fullPath.Directory.Parent.FullName, name);
-                var folder = db.Contents.SingleOrDefault(f => f.Path == fullPath.Directory.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~"));
-                folder.Path = newPath.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~"); folder.Name = name;
+                var FullPath = fullPath.Directory.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+                var folder = db.Contents.SingleOrDefault(f => f.Path == FullPath);
+                folder.Path = newPath.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+                folder.Name = name;
                 db.SaveChanges();
                 System.IO.Directory.Move(fullPath.Directory.FullName, newPath);
                 answer.Added.Add(DTOBase.Create(new DirectoryInfo(newPath), fullPath.Root));
@@ -386,8 +413,11 @@ namespace ElFinder
             else
             {
                 string newPath = Path.Combine(fullPath.File.DirectoryName, name);
-                var file = db.Contents.SingleOrDefault(f => f.Path == fullPath.Directory.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~"));
-                file.Path = newPath.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~"); file.Name = name;
+                var FullPath = fullPath.Directory.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+
+                var file = db.Contents.SingleOrDefault(f => f.Path == FullPath);
+                file.Path = newPath.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+                file.Name = name;
                 File.Move(fullPath.File.FullName, newPath);
                 answer.Added.Add(DTOBase.Create(new FileInfo(newPath), fullPath.Root));
             }
@@ -402,6 +432,11 @@ namespace ElFinder
                 RemoveThumbs(fullPath);
                 if (fullPath.Directory != null)
                 {
+                    var FullPath = fullPath.Directory.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+                    var tempFolder = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.Folder)
+                               .SingleOrDefault(f => f.Path == FullPath);
+                    db.Contents.Remove(tempFolder);
+                    db.SaveChanges();
                     DirectoryDelete(fullPath.Directory, true);
                     System.IO.Directory.Delete(fullPath.Directory.FullName, true);
                 }
@@ -458,7 +493,8 @@ namespace ElFinder
                         {
                             return Error.MissedParameter("Error Occured .. Reload and Try Again Later");
                         }
-                        var OldFolderDB = db.Contents.SingleOrDefault(f => f.Path == OldPath.Directory.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~") && f.Type == DB_Project.DataBase.Models.Type.Folder);
+                        var FullPath = OldPath.Directory.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+                        var OldFolderDB = db.Contents.SingleOrDefault(f => f.Path == FullPath && f.Type == DB_Project.DataBase.Models.Type.Folder);
                         OldFolderDB.Path = newDir.FullName;
                         db.SaveChanges();
                         RemoveThumbs(src);
@@ -478,7 +514,8 @@ namespace ElFinder
                         File.Delete(newFilePath);
                     if (isCut)
                     {
-                        var OldPathDB = db.Contents.SingleOrDefault(c => c.Path == OldPath.File.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~") && c.Type == DB_Project.DataBase.Models.Type.File);
+                        var FullPath = OldPath.File.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+                        var OldPathDB = db.Contents.SingleOrDefault(c => c.Path == FullPath && c.Type == DB_Project.DataBase.Models.Type.File);
                         OldPathDB.Path = newFilePath;
                         try
                         {

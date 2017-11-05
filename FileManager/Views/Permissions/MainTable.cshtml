@@ -27,18 +27,7 @@
                            OnFailure = "AjaxFailed",
                            OnBegin = "AjaxBegin",
                            OnComplete = "AjaxCompleted"
-                       }, new { @class = "btn btn-success" }) |
-                        @Ajax.ActionLink("Delete", "RenderDelete", new { id = item.ID },
-                       new AjaxOptions
-                       {
-                           AllowCache = false,
-                           HttpMethod = "POST",
-                           InsertionMode = InsertionMode.ReplaceWith,
-                           UpdateTargetId = "ModalDiv",
-                           OnFailure = "AjaxFailed",
-                           OnBegin = "AjaxBegin",
-                           OnComplete = "AjaxCompleted"
-                       }, new { @class = "btn btn-danger" })
+                       }, new { @class = "btn btn-success" })
                     </td>
                 </tr>
             }
