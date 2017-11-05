@@ -17,7 +17,7 @@
             {
                         <tr id="@Content.ID">
                             <td>
-                                <span>@Content.Name</span>&nbsp;&nbsp;<span>(&nbsp;@(Content.Path.Replace((Server.MapPath("~/Content/Files")), "~"))&nbsp;)</span>
+                                <span>@Content.Name</span>&nbsp;&nbsp;<span>(&nbsp;@(Content.Path)&nbsp;)</span>
                             </td>
                             <td>
                                 <span>@(Content.Type == 0 ? "File" : "Folder")</span>
