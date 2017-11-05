@@ -95,16 +95,16 @@
     <Compile Include="DataBase\Models\Role.cs" />
     <Compile Include="DataBase\Models\User.cs" />
     <Compile Include="DataBase\Models\UserContentPermission.cs" />
-    <Compile Include="Migrations\201711040818558_intial.cs" />
-    <Compile Include="Migrations\201711040818558_intial.Designer.cs">
-      <DependentUpon>201711040818558_intial.cs</DependentUpon>
+    <Compile Include="Migrations\201711051028235_intial.cs" />
+    <Compile Include="Migrations\201711051028235_intial.Designer.cs">
+      <DependentUpon>201711051028235_intial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201711040818558_intial.resx">
-      <DependentUpon>201711040818558_intial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201711051028235_intial.resx">
+      <DependentUpon>201711051028235_intial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

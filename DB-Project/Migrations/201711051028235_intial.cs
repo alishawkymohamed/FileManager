@@ -39,7 +39,7 @@ namespace DB_Project.Migrations
                 "dbo.Permissions",
                 c => new
                     {
-                        ID = c.Int(nullable: false, identity: true),
+                        ID = c.Int(nullable: false),
                         Name = c.String(nullable: false),
                     })
                 .PrimaryKey(t => t.ID);

@@ -12,6 +12,7 @@ namespace FileManager.Controllers
     {
         public virtual ActionResult Index(string folder, string subFolder)
         {
+            Session.Add("UserId", 2);
             var driver = new FileSystemDriver();
             var root = new Root(new DirectoryInfo(Server.MapPath("~/Content/" + folder)),
                 "http://" + Request.Url.Authority + "/Content/" + folder + "/")
