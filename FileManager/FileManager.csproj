@@ -575,6 +575,7 @@
     <Compile Include="Controllers\FileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PermissionsController.cs" />
+    <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -592,6 +593,11 @@
     <Content Include="Views\ControlPermissions\mainTable.cshtml" />
     <Content Include="Scripts\jquery-1.12.4.min.map" />
     <Content Include="Views\Permissions\P_Edit.cshtml" />
+    <Content Include="Views\Roles\P_Create.cshtml" />
+    <Content Include="Views\Roles\P_Delete.cshtml" />
+    <Content Include="Views\Roles\P_Edit.cshtml" />
+    <Content Include="Views\Roles\Index.cshtml" />
+    <Content Include="Views\Roles\MainTable.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -1,0 +1,48 @@
+﻿@model IEnumerable<DB_Project.DataBase.Models.Role>
+
+<div id="mainTableDiv">
+    <table class="table table-bordered table-striped table-hover" id="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Ajax.ActionLink("Edit", "RenderEdit", new { id = item.ID },
+                           new AjaxOptions
+                           {
+                               AllowCache = false,
+                               HttpMethod = "POST",
+                               InsertionMode = InsertionMode.ReplaceWith,
+                               UpdateTargetId = "ModalDiv",
+                               OnFailure = "AjaxFailed",
+                               OnBegin = "AjaxBegin",
+                               OnComplete = "AjaxCompleted"
+                           }, new { @class = "btn btn-success" }) |
+                        @Ajax.ActionLink("Delete", "RenderDelete", new { id = item.ID },
+                           new AjaxOptions
+                           {
+                               AllowCache = false,
+                               HttpMethod = "POST",
+                               InsertionMode = InsertionMode.ReplaceWith,
+                               UpdateTargetId = "ModalDiv",
+                               OnFailure = "AjaxFailed",
+                               OnBegin = "AjaxBegin",
+                               OnComplete = "AjaxCompleted"
+                           }, new { @class = "btn btn-danger" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
