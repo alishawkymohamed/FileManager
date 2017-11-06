@@ -30,10 +30,14 @@ namespace FileManager.Controllers
             Users.Add(new { ID = 0, Name = "-- Select User --" });
             ViewBag.Users = new SelectList(Users.OrderBy(u => u.ID).ToList(), "ID", "Name");
 
+            var Roles = db.Roles.Select(u => new { u.ID, u.Name }).ToList();
+            Roles.Add(new { ID = 0, Name = "-- Select Role --" });
+            ViewBag.Roles = new SelectList(Roles.OrderBy(u => u.ID).ToList(), "ID", "Name");
+
             return View();
         }
         [HttpPost]
-        public ActionResult GetData(int? id)
+        public ActionResult GetData(int? Userid, int? Roleid)
         {
             ViewBag.Permissions = db.Permissions.ToList();
             var Model = new SentModel()
@@ -41,7 +45,7 @@ namespace FileManager.Controllers
                 Contents = db.Contents
                 .Include(c => c.UserContentPermissions)
                 .ToList(),
-                UserId = (int)id
+                UserId = (int)Userid
             };
             return PartialView("mainTable", Model);
         }

@@ -15,7 +15,14 @@
                 UpdateTargetId = "mainTable"
             }))
             {
-                @Html.DropDownList("id", (ViewBag.Users as SelectList), new { @class = "form-control", id = "ddlUser" })
+                <input type="button" id="selectUser" value="Select User" class="btn btn-primary" />
+                <input type="button" id="selectRole" value="Select Role" class="btn btn-primary" />
+                <div id="userDDL" hidden>
+                    @Html.DropDownList("Userid", (ViewBag.Users as SelectList), new { @class = "form-control", id = "ddlUser" })
+                </div>
+                <div id="roleDDL" hidden>
+                    @Html.DropDownList("Roleid", (ViewBag.Roles as SelectList), new { @class = "form-control", id = "ddlRole" })
+                </div>
             }
         </div>
     </div>
@@ -107,9 +114,25 @@
         }
         $(function () {
             $.LoadingOverlay("hide");
-            $("#ddlUser").on("change", (e) => {
-                if ($("#ddlUser").val() != 0) {
+            $("#ddlUser,#roleDDL").on("change", (e) => {
+                if ($("#ddlUser").val() != 0 || $("#ddlRole").val() != 0) {
                     $("form").submit();
+                }
+            });
+            $("#selectUser").on("click", (e) => {
+                if ($("#userDDL").attr("hidden") == "hidden") {
+                    $("#userDDL").removeAttr("hidden");
+                    $("#roleDDL").attr("hidden", "hidden");
+                    $("#roleDDL").val('0');
+                    $("#roleDDL option[value=0]").prop('selected', 'selected');
+                }
+            });
+            $("#selectRole").on("click", (e) => {
+                if ($("#roleDDL").attr("hidden") == "hidden") {
+                    $("#roleDDL").removeAttr("hidden");
+                    $("#userDDL").attr("hidden", "hidden");
+                    $("#userDDL").val('0');
+                    $("#userDDL option[value=0]").prop('selected', 'selected');
                 }
             });
         });

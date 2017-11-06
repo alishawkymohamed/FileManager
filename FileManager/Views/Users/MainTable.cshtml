@@ -1,0 +1,78 @@
+﻿@model IEnumerable<DB_Project.DataBase.Models.User>
+
+<div id="mainTableDiv">
+    <table class="table table-bordered table-striped table-hover" id="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Password)
+                </th>
+                <th>
+                    Role
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Password)
+                    </td>
+                    <td>
+                        @{ 
+                            for (int i = 0; i < item.Roles.Count; i++)
+                            {
+                                if (i == 0)
+                                {
+                                    <spna>@item.Roles[i].Name</spna>
+                                }
+                                else
+                                {
+                                    <spna>, @item.Roles[i].Name</spna>
+                                }
+                            }
+                        }
+                    </td>
+                    <td>
+                        @Ajax.ActionLink("Edit", "RenderEdit", new { id = item.ID },
+                           new AjaxOptions
+                           {
+                               AllowCache = false,
+                               HttpMethod = "POST",
+                               InsertionMode = InsertionMode.ReplaceWith,
+                               UpdateTargetId = "ModalDiv",
+                               OnFailure = "AjaxFailed",
+                               OnBegin = "AjaxBegin",
+                               OnComplete = "AjaxCompleted"
+                           }, new { @class = "btn btn-success" }) |
+                        @Ajax.ActionLink("Delete", "RenderDelete", new { id = item.ID },
+                           new AjaxOptions
+                           {
+                               AllowCache = false,
+                               HttpMethod = "POST",
+                               InsertionMode = InsertionMode.ReplaceWith,
+                               UpdateTargetId = "ModalDiv",
+                               OnFailure = "AjaxFailed",
+                               OnBegin = "AjaxBegin",
+                               OnComplete = "AjaxCompleted"
+                           }, new { @class = "btn btn-danger" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
