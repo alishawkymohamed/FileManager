@@ -148,7 +148,7 @@ namespace ElFinder.DTO
                         RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => CurrentUserRoleID == (v.RoleID) && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
                     }
 
-                    if (((UserHiddenPermission == null) || (RoleHiddenPermission == null || RoleHiddenPermission == null)))
+                    if (((UserHiddenPermission == null) && (RoleHiddenPermission == null && RoleHiddenPermission == null)))
                     {
                         if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                         {

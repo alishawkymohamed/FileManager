@@ -219,7 +219,7 @@ namespace ElFinder
                     UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
                     RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
                 }
-                if (((UserHiddenPermission == null) && (RoleHiddenPermission == null || UserHiddenPermission == null)))
+                if (((UserHiddenPermission == null) && (RoleHiddenPermission == null && UserHiddenPermission == null)))
                 {
                     if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                         answer.Files.Add(DTOBase.Create(item, fullPath.Root));
@@ -237,7 +237,7 @@ namespace ElFinder
                     UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
                     RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
                 }
-                if (((UserHiddenPermission == null) && (RoleHiddenPermission == null || UserHiddenPermission == null)))
+                if (((UserHiddenPermission == null) && (RoleHiddenPermission == null && UserHiddenPermission == null)))
                 {
                     if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                         answer.Files.Add(DTOBase.Create(item, fullPath.Root));
@@ -276,7 +276,7 @@ namespace ElFinder
                     RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
                 }
 
-                if (((UserHiddenPermission == null) && (RoleHiddenPermission == null || UserHiddenPermission == null)))
+                if (((UserHiddenPermission == null) && (RoleHiddenPermission == null && UserHiddenPermission == null)))
                 {
                     if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                         answer.Files.Add(DTOBase.Create(item, fullPath.Root));
@@ -293,7 +293,7 @@ namespace ElFinder
                     UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
                     RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
                 }
-                if (((UserHiddenPermission == null) && (RoleHiddenPermission == null || UserHiddenPermission == null)))
+                if (((UserHiddenPermission == null) && (RoleHiddenPermission == null && UserHiddenPermission == null)))
                 {
                     if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                         answer.Files.Add(DTOBase.Create(item, fullPath.Root));
