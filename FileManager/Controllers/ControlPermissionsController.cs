@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
+using DB_Project.DataBase.Models;
+
 namespace FileManager.Controllers
 {
     public class PermissionsData
@@ -19,8 +21,8 @@ namespace FileManager.Controllers
     }
     public class SentModel
     {
-        public int UserId { get; set; }
-        public int RoleId { get; set; }
+        public User User { get; set; }
+        public Role Role { get; set; }
         public List<DB_Project.DataBase.Models.Content> Contents { get; set; }
     }
     public class ControlPermissionsController : Controller
@@ -48,8 +50,8 @@ namespace FileManager.Controllers
                 .Include(c => c.UserContentPermissions)
                 .Include(c => c.RoleContentPermissions)
                 .ToList(),
-                UserId = (int)Userid,
-                RoleId = (int)Roleid,
+                User = db.Users.SingleOrDefault(u => u.ID == Userid),
+                Role = db.Roles.SingleOrDefault(u => u.ID == Roleid)
             };
             return PartialView("mainTable", Model);
         }

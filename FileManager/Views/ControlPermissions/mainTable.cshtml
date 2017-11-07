@@ -26,17 +26,16 @@
                         {
                             DB_Project.DataBase.Models.UserContentPermission x = null;
                             DB_Project.DataBase.Models.RoleContentPermission y = null;
-                            if (Model.UserId != 0)
+                            if (Model.User != null)
                             {
-                                x = (Model.Contents.SingleOrDefault(d => d.ID == Content.ID)).UserContentPermissions.SingleOrDefault(n => n.UserID == Model.UserId && n.ContentID == Content.ID && n.PermissionID == Permission.ID);
-                                var UserRolesIDs = Model.UserRoleIDs;
-                                var z = Model.Contents.Where(d => d.ID == Content.ID);
-                                y = (Model.Contents.SingleOrDefault(d => d.ID == Content.ID)).RoleContentPermissions.SingleOrDefault(n => UserRolesIDs.Contains(n.RoleID) && n.ContentID == Content.ID && n.PermissionID == Permission.ID);
+                                x = (Model.Contents.SingleOrDefault(d => d.ID == Content.ID)).UserContentPermissions.SingleOrDefault(n => n.UserID == Model.User.ID && n.ContentID == Content.ID && n.PermissionID == Permission.ID);
+                                var UserRoleID = Model.User.RoleId;
+                                y = (Model.Contents.SingleOrDefault(d => d.ID == Content.ID)).RoleContentPermissions.SingleOrDefault(n => UserRoleID == (n.RoleID) && n.ContentID == Content.ID && n.PermissionID == Permission.ID);
                                 <td class="text-center"><input type="checkbox" id="@Permission.ID" checked="@((x != null || y != null) ? "checked" : null)" /></td>
                             }
                             else
                             {
-                                y = (Model.Contents.SingleOrDefault(d => d.ID == Content.ID)).RoleContentPermissions.SingleOrDefault(n => n.RoleID == Model.RoleId && n.ContentID == Content.ID && n.PermissionID == Permission.ID);
+                                y = (Model.Contents.SingleOrDefault(d => d.ID == Content.ID)).RoleContentPermissions.SingleOrDefault(n => n.RoleID == Model.Role.ID && n.ContentID == Content.ID && n.PermissionID == Permission.ID);
                                 <td class="text-center"><input type="checkbox" id="@Permission.ID" checked="@((y == null) ? null : "checked")" /></td>
                             }
                         }
