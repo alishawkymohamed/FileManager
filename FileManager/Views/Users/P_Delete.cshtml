@@ -36,6 +36,10 @@
                     <dd>
                         @Html.DisplayFor(model => model.Password)
                     </dd>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Role.Name)
+                    </dd>
                 </dl>
 
                 @using (Ajax.BeginForm("Delete", "Users", new { id = Model.ID }, new AjaxOptions

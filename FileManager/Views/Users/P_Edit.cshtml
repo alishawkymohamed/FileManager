@@ -49,7 +49,7 @@
                         <div class="form-group">
                             @Html.Label("", "Select Roles", htmlAttributes: new { @class = "control-label col-md-2" })
                             <div class="col-md-10">
-                                @Html.DropDownList("RoleID", (ViewBag.UserRoles as MultiSelectList), new { @class = "form-control", multiple = "multiple" })
+                                @Html.DropDownList("RoleId", (ViewBag.UserRoles as SelectList), new { @class = "form-control" })
                             </div>
                         </div>
                         <div class="form-group">

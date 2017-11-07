@@ -22,24 +22,21 @@ namespace FileManager.Controllers
         [HttpPost]
         public ActionResult RenderCreate()
         {
-            ViewBag.Roles = db.Roles.OrderBy(r => r.ID).ToList();
+            var Roles = db.Roles.OrderBy(r => r.ID).ToList();
+            Roles.Add(new Role() { ID = 0, Name = "-- Select Role --" });
+            ViewBag.Roles = Roles.OrderBy(r => r.ID).ToList();
             return PartialView("P_Create");
         }
 
         [HttpPost]
-        public ActionResult Create(User user , List<int> RoleID)
+        public ActionResult Create(User user)
         {
             if (ModelState.IsValid)
             {
-                foreach (var role in RoleID)
-                {
-                    user.Roles.Add(db.Roles.SingleOrDefault(r => r.ID == role));
-                }
                 db.Users.Add(user);
                 db.SaveChanges();
                 return PartialView("MainTable", db.Users.OrderBy(u => u.ID).ToList());
             }
-
             return PartialView("P_Create");
         }
         [HttpPost]
@@ -54,14 +51,13 @@ namespace FileManager.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.Roles = db.Roles.OrderBy(r => r.ID).ToList();
-            var UserRoles = new MultiSelectList(db.Roles.OrderBy(r => r.ID).ToList(), "ID", "Name", db.Users.SingleOrDefault(r => r.ID == id).Roles.Select(u => u.ID));
+            var UserRoles = new SelectList(db.Roles.OrderBy(r => r.ID).ToList(), "ID", "Name", db.Users.SingleOrDefault(r => r.ID == id).RoleId);
             ViewBag.UserRoles = UserRoles;
             return PartialView("P_Edit",user);
         }
 
         [HttpPost]
-        public ActionResult Edit(User user, IEnumerable<int> RoleID)
+        public ActionResult Edit(User user)
         {
             if (ModelState.IsValid)
             {
@@ -69,18 +65,9 @@ namespace FileManager.Controllers
                 oldUser.Email = user.Email;
                 oldUser.Name = user.Name;
                 oldUser.Password = user.Password;
-                if (RoleID != null)
-                {
-                    oldUser.Roles.RemoveAll(u => 1 == 1);
-                    db.SaveChanges();
-                    oldUser.Roles = db.Roles.Where(r => RoleID.Contains(r.ID)).ToList();
-                }
-                else
-                {
-                    oldUser.Roles.RemoveAll(u => 1 == 1);
-                }
+                oldUser.RoleId = user.RoleId;
                 db.SaveChanges();
-                return PartialView("MainTable", db.Users.OrderBy(u => u.ID).Include(u=>u.Roles).ToList());
+                return PartialView("MainTable", db.Users.OrderBy(u => u.ID).ToList());
             }
             return PartialView("P_Edit", user);
         }

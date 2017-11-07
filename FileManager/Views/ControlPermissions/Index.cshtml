@@ -58,6 +58,7 @@
                     fontawesome: "fa fa-spinner fa-spin"
                 });
                 dataToBeSent.UserId = $("#ddlUser").val();
+                dataToBeSent.RoleId = $("#ddlRole").val();
                 dataToBeSent.PermissionsData = [];
                 for (var i = 0; i < table.$("tr").length; i++) {
                     var Temp = {};
@@ -125,6 +126,7 @@
                     $("#roleDDL").attr("hidden", "hidden");
                     $("#roleDDL").val('0');
                     $("#roleDDL option[value=0]").prop('selected', 'selected');
+                    $("#mainTable").html("");
                 }
             });
             $("#selectRole").on("click", (e) => {
@@ -133,6 +135,7 @@
                     $("#userDDL").attr("hidden", "hidden");
                     $("#userDDL").val('0');
                     $("#userDDL option[value=0]").prop('selected', 'selected');
+                    $("#mainTable").html("");
                 }
             });
         });

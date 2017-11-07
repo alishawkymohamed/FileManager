@@ -41,34 +41,17 @@ namespace FileManager.Controllers
         [HttpPost]
         public ActionResult GetData(int? Userid, int? Roleid)
         {
-            if (Roleid == 0)
+            ViewBag.Permissions = db.Permissions.ToList();
+            var Model = new SentModel()
             {
-                ViewBag.Permissions = db.Permissions.ToList();
-                var Model = new SentModel()
-                {
-                    Contents = db.Contents
-                    .Include(c => c.UserContentPermissions)
-                    .Include(c => c.RoleContentPermissions)
-                    .ToList(),
-                    UserId = (int)Userid,
-                    RoleId = (int)Roleid
-                };
-                return PartialView("mainTable", Model);
-            }
-            else
-            {
-                ViewBag.Permissions = db.Permissions.ToList();
-                var Model = new SentModel()
-                {
-                    Contents = db.Contents
-                    .Include(c => c.UserContentPermissions)
-                    .Include(c => c.RoleContentPermissions)
-                    .ToList(),
-                    UserId = (int)Userid,
-                    RoleId = (int)Roleid
-                };
-                return PartialView("mainTable", Model);
-            }
+                Contents = db.Contents
+                .Include(c => c.UserContentPermissions)
+                .Include(c => c.RoleContentPermissions)
+                .ToList(),
+                UserId = (int)Userid,
+                RoleId = (int)Roleid,
+            };
+            return PartialView("mainTable", Model);
         }
         [HttpPost]
         public ActionResult SaveData(SentData dataToBeSent)
@@ -100,6 +83,7 @@ namespace FileManager.Controllers
                 foreach (var item in dataToBeSent.PermissionsData)
                 {
                     db.RoleContentPermissions.RemoveRange(db.RoleContentPermissions.Where(v => v.RoleID == dataToBeSent.RoleId && v.ContentID == item.ContentId).ToList());
+                    var UsersHavingThisRole = db.Roles.SingleOrDefault(r => r.ID == dataToBeSent.RoleId).Users.ToList();
                     if (item.Permissions != null)
                     {
                         foreach (var obj in item.Permissions)
@@ -117,7 +101,7 @@ namespace FileManager.Controllers
                     return Json(false);
                 }
             }
-            
+
             return Json(true);
         }
         protected override void Dispose(bool disposing)

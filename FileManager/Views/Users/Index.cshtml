@@ -26,6 +26,11 @@
 
 @section scripts{
     <script>
+        $.LoadingOverlay("show", {
+            fade: [1000, 1000],
+            image: "",
+            fontawesome: "fa fa-spinner fa-spin"
+        });
         function AjaxCompleted() {
             $.LoadingOverlay("hide");
             setTimeout(() => {
@@ -62,20 +67,17 @@
             }, { type: 'danger' });
         }
         function DataSent() {
+            if (table) {
+                table.destroy();
+            }
             $.LoadingOverlay("hide");
             $("#ModalDiv").modal("hide");
             $("#table").DataTable({ "aaSorting": [] });
         }
         // ================================================= //
-        $.LoadingOverlay("show", {
-            fade: [1000, 1000],
-            image: "",
-            fontawesome: "fa fa-spinner fa-spin"
-        });
         $(function () {
             $.LoadingOverlay("hide");
-            $("#table").DataTable({ "aaSorting": [] });
+            table = $("#table").DataTable({ "aaSorting": [] });
         });
-
     </script>
 }

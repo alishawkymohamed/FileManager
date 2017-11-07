@@ -207,16 +207,19 @@ namespace ElFinder
             var Files = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.File);
             var Folders = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.Folder);
             var UserId = int.Parse(System.Web.HttpContext.Current.Session["UserId"].ToString());
+            var UserRolesID = db.Users.SingleOrDefault(u => u.ID == UserId).RoleId;
             foreach (FileInfo item in fullPath.Directory.GetFiles())
             {
                 var RealPath = item.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
                 var CurrentFile = Files.SingleOrDefault(f => f.Name == item.Name && f.Path == RealPath && f.Type == DB_Project.DataBase.Models.Type.File);
-                DB_Project.DataBase.Models.UserContentPermission HiddenPermission = null;
+                DB_Project.DataBase.Models.UserContentPermission UserHiddenPermission = null;
+                DB_Project.DataBase.Models.RoleContentPermission RoleHiddenPermission = null;
                 if (CurrentFile != null)
                 {
-                    HiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                    UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                    RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
                 }
-                if (HiddenPermission == null)
+                if (((UserHiddenPermission == null) && (RoleHiddenPermission == null || UserHiddenPermission == null)))
                 {
                     if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                         answer.Files.Add(DTOBase.Create(item, fullPath.Root));
@@ -226,12 +229,15 @@ namespace ElFinder
             {
                 var RealPath = item.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
                 var CurrentFolder = Folders.SingleOrDefault(f => f.Name == item.Name && f.Path == RealPath && f.Type == DB_Project.DataBase.Models.Type.Folder);
-                DB_Project.DataBase.Models.UserContentPermission HiddenPermission = null;
+                DB_Project.DataBase.Models.UserContentPermission UserHiddenPermission = null;
+                DB_Project.DataBase.Models.RoleContentPermission RoleHiddenPermission = null;
+
                 if (CurrentFolder != null)
                 {
-                    HiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                    UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                    RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
                 }
-                if (HiddenPermission == null)
+                if (((UserHiddenPermission == null) && (RoleHiddenPermission == null || UserHiddenPermission == null)))
                 {
                     if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                         answer.Files.Add(DTOBase.Create(item, fullPath.Root));
@@ -257,17 +263,20 @@ namespace ElFinder
             var Files = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.File);
             var Folders = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.Folder);
             var UserId = int.Parse(System.Web.HttpContext.Current.Session["UserId"].ToString());
+            var UserRolesID = db.Users.SingleOrDefault(u => u.ID == UserId).RoleId;
             foreach (FileInfo item in fullPath.Directory.GetFiles())
             {
                 var RealPath = item.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
                 var CurrentFile = Files.SingleOrDefault(f => f.Name == item.Name && f.Path == RealPath && f.Type == DB_Project.DataBase.Models.Type.File);
-                DB_Project.DataBase.Models.UserContentPermission HiddenPermission = null;
+                DB_Project.DataBase.Models.UserContentPermission UserHiddenPermission = null;
+                DB_Project.DataBase.Models.RoleContentPermission RoleHiddenPermission = null;
                 if (CurrentFile != null)
                 {
-                    HiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                    UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                    RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
                 }
 
-                if (HiddenPermission == null)
+                if (((UserHiddenPermission == null) && (RoleHiddenPermission == null || UserHiddenPermission == null)))
                 {
                     if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                         answer.Files.Add(DTOBase.Create(item, fullPath.Root));
@@ -277,12 +286,14 @@ namespace ElFinder
             {
                 var RealPath = item.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
                 var CurrentFolder = Folders.SingleOrDefault(f => f.Name == item.Name && f.Path == RealPath && f.Type == DB_Project.DataBase.Models.Type.Folder);
-                DB_Project.DataBase.Models.UserContentPermission HiddenPermission = null;
+                DB_Project.DataBase.Models.UserContentPermission UserHiddenPermission = null;
+                DB_Project.DataBase.Models.RoleContentPermission RoleHiddenPermission = null;
                 if (CurrentFolder != null)
                 {
-                    HiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                    UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                    RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
                 }
-                if (HiddenPermission == null)
+                if (((UserHiddenPermission == null) && (RoleHiddenPermission == null || UserHiddenPermission == null)))
                 {
                     if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                         answer.Files.Add(DTOBase.Create(item, fullPath.Root));
