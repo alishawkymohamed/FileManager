@@ -72,14 +72,19 @@ namespace ElFinder.DTO
 
             var Files = db.Contents.Where(f => f.Type == DB_Project.DataBase.Models.Type.File);
             var UserId = int.Parse(System.Web.HttpContext.Current.Session["UserId"].ToString());
+            var CurrentUser = db.Users.SingleOrDefault(u => u.ID == UserId);
             var RealPath = info.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
             var CurrentFile = Files.SingleOrDefault(f => f.Name == info.Name && f.Path == RealPath && f.Type == DB_Project.DataBase.Models.Type.File);
-            DB_Project.DataBase.Models.UserContentPermission ReadOnlyPermission = null;
-            DB_Project.DataBase.Models.UserContentPermission LockedPermission = null;
+            DB_Project.DataBase.Models.UserContentPermission UserReadOnlyPermission = null;
+            DB_Project.DataBase.Models.RoleContentPermission RoleReadOnlyPermission = null;
+            DB_Project.DataBase.Models.UserContentPermission UserLockedPermission = null;
+            DB_Project.DataBase.Models.RoleContentPermission RoleLockedPermission = null;
             if (CurrentFile != null)
             {
-                LockedPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Locked);
-                ReadOnlyPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.ReadOnly);
+                UserLockedPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Locked);
+                UserReadOnlyPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.ReadOnly);
+                RoleLockedPermission = db.RoleContentPermissions.SingleOrDefault(v => CurrentUser.Roles.Select(r => r.ID).Contains(v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Locked);
+                RoleReadOnlyPermission = db.RoleContentPermissions.SingleOrDefault(v => CurrentUser.Roles.Select(r => r.ID).Contains(v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.ReadOnly);
             }
 
 
@@ -96,8 +101,8 @@ namespace ElFinder.DTO
                 response = new FileDTO();
             }
             response.Read = 1;
-            response.Write = (info.IsReadOnly || ReadOnlyPermission != null) ? (byte)0 : (byte)1;
-            if (LockedPermission != null)
+            response.Write = (info.IsReadOnly || UserReadOnlyPermission != null || RoleReadOnlyPermission != null) ? (byte)0 : (byte)1;
+            if (UserLockedPermission != null || RoleLockedPermission != null)
             {
                 response.Locked = (byte)1;
             }
@@ -128,7 +133,7 @@ namespace ElFinder.DTO
             {
                 bool hasSubdirs = false;
                 DirectoryInfo[] subdirs = directory.GetDirectories();
-                
+
                 foreach (var item in subdirs)
                 {
                     var RealPath = item.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
@@ -147,7 +152,7 @@ namespace ElFinder.DTO
                             break;
                         }
                     }
-                    
+
                 }
                 RootDTO response = new RootDTO()
                 {
@@ -170,27 +175,32 @@ namespace ElFinder.DTO
 
                 var RealPath = directory.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
                 var CurrentFolder = Folders.SingleOrDefault(f => f.Name == directory.Name && f.Path == RealPath && f.Type == DB_Project.DataBase.Models.Type.Folder);
-                DB_Project.DataBase.Models.UserContentPermission ReadOnlyPermission = null;
-                DB_Project.DataBase.Models.UserContentPermission LockedPermission = null;
+                var CurrentUser = db.Users.SingleOrDefault(u => u.ID == UserId);
+                DB_Project.DataBase.Models.UserContentPermission UserReadOnlyPermission = null;
+                DB_Project.DataBase.Models.RoleContentPermission RoleReadOnlyPermission = null;
+                DB_Project.DataBase.Models.UserContentPermission UserLockedPermission = null;
+                DB_Project.DataBase.Models.RoleContentPermission RoleLockedPermission = null;
                 if (CurrentFolder != null)
                 {
-                    LockedPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Locked);
-                    ReadOnlyPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.ReadOnly);
-                    if (LockedPermission != null)
+                    UserLockedPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Locked);
+                    RoleLockedPermission = db.RoleContentPermissions.SingleOrDefault(v => CurrentUser.Roles.Select(r => r.ID).Contains(v.RoleID) && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Locked);
+                    UserReadOnlyPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.ReadOnly);
+                    RoleReadOnlyPermission = db.RoleContentPermissions.SingleOrDefault(v => CurrentUser.Roles.Select(r => r.ID).Contains(v.RoleID) && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.ReadOnly);
+                    if (UserLockedPermission != null || RoleLockedPermission != null)
                     {
                         root.LockedFolders = new System.Collections.Generic.List<string>();
                         root.LockedFolders.Add(CurrentFolder.Name);
                     }
                 }
-                
+
                 DirectoryDTO response = new DirectoryDTO()
                 {
                     Mime = "directory",
                     ContainsChildDirs = directory.GetDirectories().Length > 0 ? (byte)1 : (byte)0,
                     Hash = root.VolumeId + Helper.EncodePath(directory.FullName.Substring(root.Directory.FullName.Length)),
                     Read = 1,
-                    Write = (root.IsReadOnly || ReadOnlyPermission != null) ? (byte)0 : (byte)1,
-                    Locked = (root.LockedFolders == null ? (byte)0 : ((root.LockedFolders.Any(f => f == directory.Name) || root.IsLocked || LockedPermission != null) ? (byte)1 : (byte)0)),
+                    Write = (root.IsReadOnly || UserReadOnlyPermission != null || RoleReadOnlyPermission != null) ? (byte)0 : (byte)1,
+                    Locked = (root.LockedFolders == null ? (byte)0 : ((root.LockedFolders.Any(f => f == directory.Name) || root.IsLocked || UserLockedPermission != null || RoleLockedPermission != null) ? (byte)1 : (byte)0)),
                     Size = 0,
                     Name = directory.Name,
                     UnixTimeStamp = (long)(directory.LastWriteTimeUtc - _unixOrigin).TotalSeconds,

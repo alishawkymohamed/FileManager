@@ -1,39 +1,49 @@
 ﻿@model FileManager.Controllers.SentModel
-    <div id="mainTable">
-        <div class="row">
-            <table class="table table-bordered table-striped table-hover" id="table">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Type</th>
+<div id="mainTable">
+    <div class="row">
+        <table class="table table-bordered table-striped table-hover" id="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Type</th>
+                    @foreach (var Permission in (ViewBag.Permissions as IEnumerable<DB_Project.DataBase.Models.Permission>))
+                    {
+                        <th class="text-center">@Permission.Name</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var Content in Model.Contents)
+                {
+                    <tr id="@Content.ID">
+                        <td>
+                            <span><strong>@Content.Name</strong></span>&nbsp;&nbsp;<span>(&nbsp;@(Content.Path)&nbsp;)</span>
+                        </td>
+                        <td>
+                            <span>@(Content.Type == 0 ? "File" : "Folder")</span>
+                        </td>
                         @foreach (var Permission in (ViewBag.Permissions as IEnumerable<DB_Project.DataBase.Models.Permission>))
                         {
-                            <th class="text-center">@Permission.Name</th>
+                            DB_Project.DataBase.Models.UserContentPermission x = null;
+                            DB_Project.DataBase.Models.RoleContentPermission y = null;
+                            if (Model.UserId != 0)
+                            {
+                                x = (Model.Contents.SingleOrDefault(d => d.ID == Content.ID)).UserContentPermissions.SingleOrDefault(n => n.UserID == Model.UserId && n.ContentID == Content.ID && n.PermissionID == Permission.ID);
+                            }
+                            else
+                            {
+                                y = (Model.Contents.SingleOrDefault(d => d.ID == Content.ID)).RoleContentPermissions.SingleOrDefault(n => n.RoleID == Model.RoleId && n.ContentID == Content.ID && n.PermissionID == Permission.ID);
+                            }
+                            <td class="text-center"><input type="checkbox" id="@Permission.ID" checked="@((x == null && y == null) ? null : "checked")" /></td>
                         }
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var Content in Model.Contents)
-            {
-                        <tr id="@Content.ID">
-                            <td>
-                                <span><strong>@Content.Name</strong></span>&nbsp;&nbsp;<span>(&nbsp;@(Content.Path)&nbsp;)</span>
-                            </td>
-                            <td>
-                                <span>@(Content.Type == 0 ? "File" : "Folder")</span>
-                            </td>
-                            @foreach (var Permission in (ViewBag.Permissions as IEnumerable<DB_Project.DataBase.Models.Permission>))
-                            {
-                                <td class="text-center"><input type="checkbox" id="@Permission.ID" checked="@((Model.Contents.SingleOrDefault(d => d.ID == Content.ID)).UserContentPermissions.SingleOrDefault(n => n.UserID == Model.UserId && n.ContentID == Content.ID && n.PermissionID == Permission.ID))" /></td>
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-        <div class="row">
-            <div class="col-sm-offset-3 col-sm-6">
-                <input type="button" value="Save" id="btnSave" class="btn btn-block" />
-            </div>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        <div class="col-sm-offset-3 col-sm-6">
+            <input type="button" value="Save" id="btnSave" class="btn btn-block" />
         </div>
     </div>
+</div>

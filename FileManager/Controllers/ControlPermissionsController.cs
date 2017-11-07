@@ -14,11 +14,13 @@ namespace FileManager.Controllers
     public class SentData
     {
         public int UserId { get; set; }
+        public int RoleId { get; set; }
         public List<PermissionsData> PermissionsData { get; set; }
     }
     public class SentModel
     {
         public int UserId { get; set; }
+        public int RoleId { get; set; }
         public List<DB_Project.DataBase.Models.Content> Contents { get; set; }
     }
     public class ControlPermissionsController : Controller
@@ -39,38 +41,83 @@ namespace FileManager.Controllers
         [HttpPost]
         public ActionResult GetData(int? Userid, int? Roleid)
         {
-            ViewBag.Permissions = db.Permissions.ToList();
-            var Model = new SentModel()
+            if (Roleid == 0)
             {
-                Contents = db.Contents
-                .Include(c => c.UserContentPermissions)
-                .ToList(),
-                UserId = (int)Userid
-            };
-            return PartialView("mainTable", Model);
+                ViewBag.Permissions = db.Permissions.ToList();
+                var Model = new SentModel()
+                {
+                    Contents = db.Contents
+                    .Include(c => c.UserContentPermissions)
+                    .Include(c => c.RoleContentPermissions)
+                    .ToList(),
+                    UserId = (int)Userid,
+                    RoleId = (int)Roleid
+                };
+                return PartialView("mainTable", Model);
+            }
+            else
+            {
+                ViewBag.Permissions = db.Permissions.ToList();
+                var Model = new SentModel()
+                {
+                    Contents = db.Contents
+                    .Include(c => c.UserContentPermissions)
+                    .Include(c => c.RoleContentPermissions)
+                    .ToList(),
+                    UserId = (int)Userid,
+                    RoleId = (int)Roleid
+                };
+                return PartialView("mainTable", Model);
+            }
         }
         [HttpPost]
         public ActionResult SaveData(SentData dataToBeSent)
         {
-            foreach (var item in dataToBeSent.PermissionsData)
+            if (dataToBeSent.UserId != 0)
             {
-                db.UserContentPermissions.RemoveRange(db.UserContentPermissions.Where(v => v.UserID == dataToBeSent.UserId && v.ContentID == item.ContentId).ToList());
-                if (item.Permissions != null)
+                foreach (var item in dataToBeSent.PermissionsData)
                 {
-                    foreach (var obj in item.Permissions)
+                    db.UserContentPermissions.RemoveRange(db.UserContentPermissions.Where(v => v.UserID == dataToBeSent.UserId && v.ContentID == item.ContentId).ToList());
+                    if (item.Permissions != null)
                     {
-                        db.UserContentPermissions.Add(new DB_Project.DataBase.Models.UserContentPermission() { UserID = dataToBeSent.UserId, ContentID = item.ContentId, PermissionID = obj });
+                        foreach (var obj in item.Permissions)
+                        {
+                            db.UserContentPermissions.Add(new DB_Project.DataBase.Models.UserContentPermission() { UserID = dataToBeSent.UserId, ContentID = item.ContentId, PermissionID = obj });
+                        }
                     }
                 }
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch (Exception)
+                {
+                    return Json(false);
+                }
             }
-            try
+            else
             {
-                db.SaveChanges();
+                foreach (var item in dataToBeSent.PermissionsData)
+                {
+                    db.RoleContentPermissions.RemoveRange(db.RoleContentPermissions.Where(v => v.RoleID == dataToBeSent.RoleId && v.ContentID == item.ContentId).ToList());
+                    if (item.Permissions != null)
+                    {
+                        foreach (var obj in item.Permissions)
+                        {
+                            db.RoleContentPermissions.Add(new DB_Project.DataBase.Models.RoleContentPermission() { RoleID = dataToBeSent.RoleId, ContentID = item.ContentId, PermissionID = obj });
+                        }
+                    }
+                }
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch (Exception)
+                {
+                    return Json(false);
+                }
             }
-            catch (Exception)
-            {
-                return Json(false);
-            }
+            
             return Json(true);
         }
         protected override void Dispose(bool disposing)

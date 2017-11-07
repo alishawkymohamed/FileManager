@@ -12,6 +12,7 @@ namespace DB_Project.DataBase.Models
         public Content()
         {
             UserContentPermissions = new List<UserContentPermission>();
+            RoleContentPermissions = new List<RoleContentPermission>();
         }
         public int ID { get; set; }
         [Required]
@@ -21,6 +22,7 @@ namespace DB_Project.DataBase.Models
         [Required]
         public Type Type { get; set; }
         public virtual List<UserContentPermission> UserContentPermissions { get; set; }
+        public virtual List<RoleContentPermission> RoleContentPermissions { get; set; }
 
     }
 }
