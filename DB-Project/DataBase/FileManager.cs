@@ -26,6 +26,7 @@ namespace DB_Project.DataBase
          public virtual DbSet<Content> Contents { get; set; }
          public virtual DbSet<Permission> Permissions { get; set; }
          public virtual DbSet<UserContentPermission> UserContentPermissions { get; set; }
+         public virtual DbSet<RoleContentPermission> RoleContentPermissions { get; set; }
     }
 
     //public class MyEntity
