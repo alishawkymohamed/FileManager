@@ -424,11 +424,12 @@ namespace ElFinder
             else
             {
                 string newPath = Path.Combine(fullPath.File.DirectoryName, name);
-                var FullPath = fullPath.Directory.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
+                var FullPath = fullPath.File.FullName.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
 
                 var file = db.Contents.SingleOrDefault(f => f.Path == FullPath);
                 file.Path = newPath.Replace(System.Web.HttpContext.Current.Server.MapPath("~/Content/Files"), "~");
                 file.Name = name;
+                db.SaveChanges();
                 File.Move(fullPath.File.FullName, newPath);
                 answer.Added.Add(DTOBase.Create(new FileInfo(newPath), fullPath.Root));
             }
