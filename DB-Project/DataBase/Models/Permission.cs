@@ -10,10 +10,10 @@ namespace DB_Project.DataBase.Models
     public enum Permissions
     {
         ReadOnly = 1,
-        ReadWrite = 2,
-        Locked = 3,
-        Hidden = 4
+        Locked = 2,
+        Hidden = 3
     }
+    [Table("OM-Permission")]
     public class Permission
     {
         public Permission()

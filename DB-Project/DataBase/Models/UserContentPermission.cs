@@ -6,6 +6,7 @@ using System.Web;
 
 namespace DB_Project.DataBase.Models
 {
+    [Table("OM-UserContentPermission")]
     public class UserContentPermission
     {
         public int ID { get; set; }
