@@ -17,7 +17,13 @@ namespace FileManager.Controllers
 
         public ActionResult Index()
         {
-            return View(db.Permissions.OrderBy(i => i.ID).ToList());
+            if (Session["UserId"] != null && Session["Role"] != null && Session["Role"].ToString() == "Admin")
+            {
+                return View(db.Permissions.OrderBy(i => i.ID).ToList());
+            }
+            Session.Clear();
+            Session.Abandon();
+            return RedirectToAction("SignIn", "Home");
         }
         [HttpPost]
         public ActionResult RenderEdit(int? id)

@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewBag.Title = "Home";
+}
+
+<h2>Home</h2>
+
+<div class="container">
+    <div class="row">
+        @if (Session["Role"] != null && Session["Role"].ToString() == "Admin")
+        {
+            @Html.ActionLink("Users", "Index", "Users", null, new { @class = "btn btn-primary" })
+            <br />
+            @Html.ActionLink("Roles", "Index", "Roles", null, new { @class = "btn btn-primary" })
+            <br />
+            @Html.ActionLink("Permissions", "Index", "Permissions", null, new { @class = "btn btn-primary" })
+            <br />
+            @Html.ActionLink("Control Permissions", "Index", "ControlPermissions", null, new { @class = "btn btn-primary" })
+            <br />
+        }
+        @Html.ActionLink("File Manager", "Index", "Home", null, new { @class = "btn btn-primary" })
+        <br />
+    </div>
+</div>

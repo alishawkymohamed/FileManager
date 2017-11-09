@@ -17,7 +17,13 @@ namespace FileManager.Controllers
 
         public ActionResult Index()
         {
-            return View(db.Users.Include(u => u.Role).OrderBy(u => u.ID).ToList());
+            if (Session["UserId"] != null && Session["Role"] != null && Session["Role"].ToString() == "Admin")
+            {
+                return View(db.Users.Include(u => u.Role).OrderBy(u => u.ID).ToList());
+            }
+            Session.Clear();
+            Session.Abandon();
+            return RedirectToAction("SignIn", "Home");
         }
         [HttpPost]
         public ActionResult RenderCreate()
@@ -33,6 +39,10 @@ namespace FileManager.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (user.RoleId == 0)
+                {
+                    user.Role = null;
+                }
                 db.Users.Add(user);
                 db.SaveChanges();
                 return PartialView("MainTable", db.Users.Include(u => u.Role).OrderBy(u => u.ID).ToList());

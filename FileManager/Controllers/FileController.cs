@@ -14,7 +14,6 @@ namespace FileManager.Controllers
         private DB_Project.DataBase.FileManager db = new DB_Project.DataBase.FileManager();
         public virtual ActionResult Index(string folder, string subFolder)
         {
-            Session.Add("UserId", 2);
             var UserId = int.Parse(Session["UserId"].ToString());
             var UserRoleID = db.Users.SingleOrDefault(u => u.ID == UserId).RoleId;
             var driver = new FileSystemDriver();

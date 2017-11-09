@@ -1,0 +1,90 @@
+﻿@model FileManager.Models.LoginModelView
+@{
+    ViewBag.Title = "SignIn";
+}
+
+<h2>SignIn</h2>
+
+<div class="container">
+    <div class="row">
+        <form novalidate="novalidate">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-7">
+                        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", id = "email" } })
+                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-7">
+                        @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", id = "pass" } })
+                        @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="button" id="submitBtn" value="Sign In" class="btn btn-primary" />
+                    </div>
+                </div>
+                <br />
+                <span id="loginError" hidden class="text-danger field-validation-error" data-valmsg-replace="true"><span generated="true" class="">Wrong Email or Password !!</span></span>
+            </div>
+        </form>
+        <div hidden="hidden">
+            <input type="button" id="submit" value="Sign In" class="btn btn-primary" />
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(function () {
+            $("#email,#pass").on("focus", function () {
+                $("#loginError").attr("hidden", "hidden");
+            });
+            $("#submit").on("click", function (e) {
+                e.preventDefault();
+                $("#loginError").attr("hidden","hidden");
+                $.LoadingOverlay("show", {
+                    fade: [1000, 1000],
+                    image: "",
+                    fontawesome: "fa fa-spinner fa-spin"
+                });
+                var email = $("#email").val();
+                var pass = $("#pass").val();
+                $.ajax({
+                    url: '@Url.Action("PerformSignIn","Home")',
+                    type: 'POST',
+                    contentType:'application/json',
+                    data: JSON.stringify({ "email": email, "pass": pass }),
+                    success: function (data) {
+                        console.log(data);
+                        if (!data) {
+                            $.LoadingOverlay("hide");
+                            $("#loginError").removeAttr("hidden");
+                        }
+                        else {
+                            $.LoadingOverlay("hide");
+                            window.location = '@Url.Action("GoHome","Home")'
+                        }
+                    },
+                    error: function () {
+                        $.notify({
+                            message: 'Error Occured.. Please Reload Page and Try Again ..'
+                        }, { type: 'danger' });}
+                })
+            });
+            $("form").on("submit", function (e) {
+                e.preventDefault();
+            })
+            $("#submitBtn").on("click", function (e) {
+                $("form").submit();
+                if ($("form").valid()) {
+                    $("#submit").click();
+                }
+            });
+        });
+    </script>
+}

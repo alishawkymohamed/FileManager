@@ -18,7 +18,7 @@ namespace DB_Project.DataBase.Models
         [Required]
         public string Name { get; set; }
         [Required]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = "Please Enter Valid Email !!")]
         public string Email { get; set; }
         [Required]
         public string Password { get; set; }

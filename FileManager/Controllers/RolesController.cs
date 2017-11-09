@@ -17,7 +17,15 @@ namespace FileManager.Controllers
 
         public ActionResult Index()
         {
-            return View(db.Roles.OrderBy(c => c.ID).ToList());
+            if (Session["UserId"] != null && Session["Role"] != null && Session["Role"].ToString() == "Admin")
+            {
+                var Roles = db.Roles.ToList();
+                Roles.Remove(db.Roles.SingleOrDefault(r => r.Name == "Admin"));
+                return View(Roles.OrderBy(c => c.ID).ToList());
+            }
+            Session.Clear();
+            Session.Abandon();
+            return RedirectToAction("SignIn", "Home");
         }
         [HttpPost]
         public ActionResult RenderCreate()
@@ -31,7 +39,9 @@ namespace FileManager.Controllers
             {
                 db.Roles.Add(role);
                 db.SaveChanges();
-                return PartialView("MainTable", db.Roles.OrderBy(i => i.ID).ToList());
+                var Roles = db.Roles.ToList();
+                Roles.Remove(db.Roles.SingleOrDefault(r => r.Name == "Admin"));
+                return PartialView("MainTable", Roles.OrderBy(i => i.ID).ToList());
             }
 
             return PartialView("P_Create",role);
@@ -57,7 +67,9 @@ namespace FileManager.Controllers
             {
                 db.Entry(role).State = EntityState.Modified;
                 db.SaveChanges();
-                return PartialView("MainTable", db.Roles.OrderBy(c => c.ID).ToList());
+                var Roles = db.Roles.ToList();
+                Roles.Remove(db.Roles.SingleOrDefault(r => r.Name == "Admin"));
+                return PartialView("MainTable", Roles.OrderBy(c => c.ID).ToList());
             }
             return PartialView("P_Edit", role);
         }
@@ -82,7 +94,9 @@ namespace FileManager.Controllers
             Role role = db.Roles.Find(id);
             db.Roles.Remove(role);
             db.SaveChanges();
-            return PartialView("MainTable", db.Roles.OrderBy(i => i.ID).ToList());
+            var Roles = db.Roles.ToList();
+            Roles.Remove(db.Roles.SingleOrDefault(r => r.Name == "Admin"));
+            return PartialView("MainTable", Roles.OrderBy(i => i.ID).ToList());
         }
         protected override void Dispose(bool disposing)
         {

@@ -15,8 +15,18 @@
                 UpdateTargetId = "mainTable"
             }))
             {
-                <input type="button" id="selectUser" value="Select User" class="btn btn-primary" />
-                <input type="button" id="selectRole" value="Select Role" class="btn btn-primary" />
+                <br />
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-6 text-center">
+                            <input type="button" id="selectUser" value="Select User" class="btn btn-primary" />
+                        </div>
+                        <div class="col-xs-6 text-center">
+                            <input type="button" id="selectRole" value="Select Role" class="btn btn-primary" />
+                        </div>
+                    </div>
+                </div>
+                <br />
                 <div id="userDDL" hidden>
                     @Html.DropDownList("Userid", (ViewBag.Users as SelectList), new { @class = "form-control", id = "ddlUser" })
                 </div>

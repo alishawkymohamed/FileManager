@@ -25,6 +25,10 @@ namespace DB_Project.Migrations
               new DataBase.Models.Permission { Name = "Locked", ID = 2 },
               new DataBase.Models.Permission { Name = "Hidden", ID = 3 }
             );
+
+            context.Roles.AddOrUpdate(new DataBase.Models.Role() { Name = "Admin" });
+
+            context.Users.AddOrUpdate(new DataBase.Models.User() { Name = "Admin", Email = "Admin@Admin.com", Password = "Admin@123456", Role = context.Roles.SingleOrDefault(r => r.Name == "Admin") });
             //
         }
     }
