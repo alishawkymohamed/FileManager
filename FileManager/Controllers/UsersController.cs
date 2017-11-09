@@ -17,7 +17,7 @@ namespace FileManager.Controllers
 
         public ActionResult Index()
         {
-            return View(db.Users.OrderBy(u => u.ID).ToList());
+            return View(db.Users.Include(u => u.Role).OrderBy(u => u.ID).ToList());
         }
         [HttpPost]
         public ActionResult RenderCreate()
@@ -35,7 +35,7 @@ namespace FileManager.Controllers
             {
                 db.Users.Add(user);
                 db.SaveChanges();
-                return PartialView("MainTable", db.Users.OrderBy(u => u.ID).ToList());
+                return PartialView("MainTable", db.Users.Include(u => u.Role).OrderBy(u => u.ID).ToList());
             }
             return PartialView("P_Create");
         }
@@ -53,7 +53,7 @@ namespace FileManager.Controllers
             }
             var UserRoles = new SelectList(db.Roles.OrderBy(r => r.ID).ToList(), "ID", "Name", db.Users.SingleOrDefault(r => r.ID == id).RoleId);
             ViewBag.UserRoles = UserRoles;
-            return PartialView("P_Edit",user);
+            return PartialView("P_Edit", user);
         }
 
         [HttpPost]
@@ -67,7 +67,7 @@ namespace FileManager.Controllers
                 oldUser.Password = user.Password;
                 oldUser.RoleId = user.RoleId;
                 db.SaveChanges();
-                return PartialView("MainTable", db.Users.OrderBy(u => u.ID).ToList());
+                return PartialView("MainTable", db.Users.Include(u => u.Role).OrderBy(u => u.ID).ToList());
             }
             return PartialView("P_Edit", user);
         }
@@ -92,7 +92,7 @@ namespace FileManager.Controllers
             User user = db.Users.Find(id);
             db.Users.Remove(user);
             db.SaveChanges();
-            return PartialView("MainTable", db.Users.OrderBy(u => u.ID).ToList());
+            return PartialView("MainTable", db.Users.Include(u => u.Role).OrderBy(u => u.ID).ToList());
         }
 
         protected override void Dispose(bool disposing)

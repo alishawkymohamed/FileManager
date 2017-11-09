@@ -22,9 +22,8 @@ namespace DB_Project.Migrations
             context.Permissions.AddOrUpdate(
               p => p.Name,
               new DataBase.Models.Permission { Name = "ReadOnly", ID = 1 },
-              new DataBase.Models.Permission { Name = "Read & Write", ID = 2 },
-              new DataBase.Models.Permission { Name = "Locked", ID = 3 },
-              new DataBase.Models.Permission { Name = "Hidden", ID = 4 }
+              new DataBase.Models.Permission { Name = "Locked", ID = 2 },
+              new DataBase.Models.Permission { Name = "Hidden", ID = 3 }
             );
             //
         }

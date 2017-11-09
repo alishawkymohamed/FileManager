@@ -17,12 +17,18 @@ namespace ElFinder
         /// </summary>
         /// <param name="directory">Directory which will be root</param>
         /// <param name="url">Url to root</param>
+        private DB_Project.DataBase.FileManager db = new DB_Project.DataBase.FileManager();
+        /// 
         public Root(DirectoryInfo directory, string url)
         {
             if (directory == null)
                 throw new ArgumentNullException("directory", "Root directory can not be null");
             if (!directory.Exists)
+            {
+                db.Contents.Add(new DB_Project.DataBase.Models.Content() { Name = "Root Folder", Path = "~", Type = DB_Project.DataBase.Models.Type.Folder });
+                db.SaveChanges();
                 directory.Create();
+            }
             //throw new ArgumentException("Root directory must exist", "directory");
             _alias = directory.Name;
             _directory = directory;

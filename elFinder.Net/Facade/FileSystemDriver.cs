@@ -216,8 +216,16 @@ namespace ElFinder
                 DB_Project.DataBase.Models.RoleContentPermission RoleHiddenPermission = null;
                 if (CurrentFile != null)
                 {
-                    UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
-                    RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                    if (db.UserContentPermissions.Where(r => r.UserID == UserId).Count() > 0)
+                    {
+                        UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                        RoleHiddenPermission = null;//db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                    }
+                    else
+                    {
+                        UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                        RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                    }
                 }
                 if (((UserHiddenPermission == null) && (RoleHiddenPermission == null && UserHiddenPermission == null)))
                 {
@@ -234,8 +242,16 @@ namespace ElFinder
 
                 if (CurrentFolder != null)
                 {
-                    UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
-                    RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                    if (db.UserContentPermissions.Where(r => r.UserID == UserId).Count() > 0)
+                    {
+                        UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                        RoleHiddenPermission = null;//db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                    }
+                    else
+                    {
+                        UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                        RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                    }
                 }
                 if (((UserHiddenPermission == null) && (RoleHiddenPermission == null && UserHiddenPermission == null)))
                 {
@@ -272,9 +288,18 @@ namespace ElFinder
                 DB_Project.DataBase.Models.RoleContentPermission RoleHiddenPermission = null;
                 if (CurrentFile != null)
                 {
-                    UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
-                    RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                    if (db.UserContentPermissions.Where(r => r.UserID == UserId).Count() > 0)
+                    {
+                        UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                        RoleHiddenPermission = null;//db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                    }
+                    else
+                    {
+                        UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                        RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                    }
                 }
+
 
                 if (((UserHiddenPermission == null) && (RoleHiddenPermission == null && UserHiddenPermission == null)))
                 {
@@ -290,9 +315,18 @@ namespace ElFinder
                 DB_Project.DataBase.Models.RoleContentPermission RoleHiddenPermission = null;
                 if (CurrentFolder != null)
                 {
-                    UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
-                    RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                    if (db.UserContentPermissions.Where(r => r.UserID == UserId).Count() > 0)
+                    {
+                        UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                        RoleHiddenPermission = null;//db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFile.ID && v.PermissionID == (int)Permissions.Hidden);
+                    }
+                    else
+                    {
+                        UserHiddenPermission = db.UserContentPermissions.SingleOrDefault(v => v.UserID == UserId && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                        RoleHiddenPermission = db.RoleContentPermissions.SingleOrDefault(v => UserRolesID == (v.RoleID) && v.ContentID == CurrentFolder.ID && v.PermissionID == (int)Permissions.Hidden);
+                    }
                 }
+                    
                 if (((UserHiddenPermission == null) && (RoleHiddenPermission == null && UserHiddenPermission == null)))
                 {
                     if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
