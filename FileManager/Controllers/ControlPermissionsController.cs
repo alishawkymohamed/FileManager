@@ -37,7 +37,7 @@ namespace FileManager.Controllers
                 ViewBag.Users = new SelectList(Users.OrderBy(u => u.ID).ToList(), "ID", "Name");
 
                 var Roles = db.Roles.Select(u => new { u.ID, u.Name }).ToList();
-                Roles.Add(new { ID = 0, Name = "-- Select Role --" });
+                Roles.Add(new { ID = 0, Name = "-- Select Group --" });
                 ViewBag.Roles = new SelectList(Roles.OrderBy(u => u.ID).ToList(), "ID", "Name");
 
                 return View();

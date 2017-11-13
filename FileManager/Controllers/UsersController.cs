@@ -31,7 +31,7 @@ namespace FileManager.Controllers
         {
             ViewBag.Emails = JsonConvert.SerializeObject(db.Users.Select(u => u.Email.ToLower()).ToList());
             var Roles = db.Roles.OrderBy(r => r.ID).ToList();
-            Roles.Add(new Role() { ID = 0, Name = "-- Select Role --" });
+            Roles.Add(new Role() { ID = 0, Name = "-- Select Group --" });
             ViewBag.Roles = Roles.OrderBy(r => r.ID).ToList();
             return PartialView("P_Create");
         }
