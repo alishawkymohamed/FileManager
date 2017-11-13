@@ -48,25 +48,6 @@ namespace FileManager.Controllers
             }
             return Json(false);
         }
-        
-        public ActionResult CheckEmail(string Email)
-        {
-            var emails = db.Users.Select(u => u.Email.ToLower()).ToList();
-            if (emails.Contains(Email.ToLower()))
-            {
-                return Json(false);
-            }
-            return Json(true);
-        }
-        public ActionResult CheckRoleName(string RoleName)
-        {
-            var RoleNames = db.Roles.Select(u => u.Name.ToLower()).ToList();
-            if (RoleNames.Contains(RoleName.ToLower()))
-            {
-                return Json(false);
-            }
-            return Json(true);
-        }
         public ActionResult SignOut()
         {
             Session.Clear();

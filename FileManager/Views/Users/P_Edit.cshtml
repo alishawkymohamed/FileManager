@@ -84,21 +84,14 @@
             $("#roleError").attr("hidden", "hidden");
         });
         $("#Email").on("keyup blur change", function (e) {
+            var Emails = @Html.Raw(ViewBag.Emails);
             var Email = $("#Email").val();
-            $.ajax({
-                url: '@Url.Action("CheckEmail","Home")',
-                type: "POST",
-                data: JSON.stringify({ "Email": Email }),
-                contentType: 'application/json',
-                success: function (data) {
-                    if (data == false) {
-                        $("#emailError").removeAttr("hidden");
-                    }
-                    else {
-                        $("#emailError").attr("hidden", "hidden");
-                    }
-                }
-            });
+            if (Emails.indexOf(Email) != -1) {
+                $("#emailError").removeAttr("hidden");
+            }
+            else {
+                $("#emailError").attr("hidden", "hidden");
+            }
         });
     </script>
 </div>

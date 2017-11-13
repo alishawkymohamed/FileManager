@@ -57,21 +57,14 @@
             }
         });
         $("#Name").on("keyup blur change", function (e) {
+            var RoleNames = @Html.Raw(ViewBag.RoleNames);
             var RoleName = $("#Name").val();
-            $.ajax({
-                url: '@Url.Action("CheckRoleName","Home")',
-                type: "POST",
-                data: JSON.stringify({ "RoleName": RoleName }),
-                contentType: 'application/json',
-                success: function (data) {
-                    if (data == false) {
-                        $("#RolenNameError").removeAttr("hidden");
-                    }
-                    else {
-                        $("#RolenNameError").attr("hidden", "hidden");
-                    }
-                }
-            });
+            if (RoleNames.indexOf(RoleName) != -1) {
+                $("#RolenNameError").removeAttr("hidden");
+            }
+            else {
+                $("#RolenNameError").attr("hidden", "hidden");
+            }
         });
     </script>
 </div>

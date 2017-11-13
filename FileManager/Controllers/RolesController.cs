@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using DB_Project.DataBase;
 using DB_Project.DataBase.Models;
+using Newtonsoft.Json;
 
 namespace FileManager.Controllers
 {
@@ -30,6 +31,7 @@ namespace FileManager.Controllers
         [HttpPost]
         public ActionResult RenderCreate()
         {
+            ViewBag.RoleNames = JsonConvert.SerializeObject(db.Roles.Select(u => u.Name.ToLower()).ToList());
             return PartialView("P_Create");
         }
         [HttpPost]
@@ -49,6 +51,7 @@ namespace FileManager.Controllers
         [HttpPost]
         public ActionResult RenderEdit(int? id)
         {
+            ViewBag.RoleNames = JsonConvert.SerializeObject(db.Roles.Select(u => u.Name.ToLower()).ToList());
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
