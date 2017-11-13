@@ -4,7 +4,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Create Role</h4>
+                <h4 class="modal-title">Create Group</h4>
             </div>
             <div class="modal-body">
                 @using (Ajax.BeginForm("Create", "Roles", null, new AjaxOptions
@@ -26,12 +26,13 @@
                             <div class="col-md-10">
                                 @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
                                 @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                                <span id="RolenNameError" hidden class="text-danger field-validation-error" data-valmsg-replace="true"><span generated="true" class="">This UserName is Already Exists.</span></span>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <div class="col-md-offset-2 col-md-10">
-                                <input type="submit" value="Create" class="btn btn-success" />
+                                <input type="submit" value="Create" id="btnSubmit" class="btn btn-success" />
                             </div>
                         </div>
                     </div>
@@ -47,6 +48,29 @@
     <script>
         $("button[value='Cancel']").on("click", function () {
             $("#ModalDiv").modal("hide").html("");
+        });
+        $("#btnSubmit").on("click", function (e) {
+            var RolenNameError = $("#RolenNameError").prop("hidden");
+            if (!RolenNameError) {
+                e.preventDefault();
+            }
+        });
+        $("#Name").on("keyup blur change", function (e) {
+            var RoleName = $("#Name").val();
+            $.ajax({
+                url: '@Url.Action("CheckRoleName", "Home")',
+                type: "POST",
+                data: JSON.stringify({ "RoleName": RoleName }),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data == false) {
+                        $("#RolenNameError").removeAttr("hidden");
+                    }
+                    else {
+                        $("#RolenNameError").attr("hidden", "hidden");
+                    }
+                }
+            });
         });
     </script>
 </div>

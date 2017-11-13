@@ -23,6 +23,10 @@ namespace FileManager.Controllers
         }
         public ActionResult SignIn()
         {
+            if (Session["Admin"] != null || Session["UserId"] != null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
         [HttpPost]
@@ -44,9 +48,24 @@ namespace FileManager.Controllers
             }
             return Json(false);
         }
-        public ActionResult GoHome()
+        
+        public ActionResult CheckEmail(string Email)
         {
-            return View();
+            var emails = db.Users.Select(u => u.Email.ToLower()).ToList();
+            if (emails.Contains(Email.ToLower()))
+            {
+                return Json(false);
+            }
+            return Json(true);
+        }
+        public ActionResult CheckRoleName(string RoleName)
+        {
+            var RoleNames = db.Roles.Select(u => u.Name.ToLower()).ToList();
+            if (RoleNames.Contains(RoleName.ToLower()))
+            {
+                return Json(false);
+            }
+            return Json(true);
         }
         public ActionResult SignOut()
         {

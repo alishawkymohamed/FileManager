@@ -8,7 +8,7 @@ namespace FileManager.Models
 {
     public class LoginModelView
     {
-        [Required][EmailAddress(ErrorMessage = "Please Enter Valid Email !!")]
+        [Required]
         public string Email { get; set; }
         [Required]
         [DataType(DataType.Password)]

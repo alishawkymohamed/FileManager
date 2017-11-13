@@ -31,7 +31,7 @@
                         </div>
 
                         <div class="form-group">
-                            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <label class="control-label col-md-2" for="Email">UserName</label>
                             <div class="col-md-10">
                                 @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
                                 @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
@@ -47,7 +47,7 @@
                         </div>
 
                         <div class="form-group">
-                            @Html.Label("", "Select Roles", htmlAttributes: new { @class = "control-label col-md-2" })
+                            @Html.Label("", "Select Group", htmlAttributes: new { @class = "control-label col-md-2" })
                             <div class="col-md-10">
                                 @Html.DropDownList("RoleId", (ViewBag.UserRoles as SelectList), new { @class = "form-control" })
                             </div>
@@ -70,6 +70,35 @@
     <script>
         $("button[value='Cancel']").on("click", function () {
             $("#ModalDiv").modal("hide").html("");
+        });
+        $("#btnSubmit").on("click", function (e) {
+            var emailError = $("#emailError").prop("hidden");
+            if ($("#RoleId").val() == "0" || !emailError) {
+                e.preventDefault();
+                if ($("#RoleId").val() == "0") {
+                    $("#roleError").removeAttr("hidden");
+                }
+            }
+        });
+        $("#RoleId").on("change", function () {
+            $("#roleError").attr("hidden", "hidden");
+        });
+        $("#Email").on("keyup blur change", function (e) {
+            var Email = $("#Email").val();
+            $.ajax({
+                url: '@Url.Action("CheckEmail","Home")',
+                type: "POST",
+                data: JSON.stringify({ "Email": Email }),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data == false) {
+                        $("#emailError").removeAttr("hidden");
+                    }
+                    else {
+                        $("#emailError").attr("hidden", "hidden");
+                    }
+                }
+            });
         });
     </script>
 </div>

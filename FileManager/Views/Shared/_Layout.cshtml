@@ -13,15 +13,22 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="row">
-                <div class="col-xs-10">
+                <div class="col-xs-3">
                     <div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
                         @Html.ActionLink("File Manager", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
                     </div>
+                </div>
+                <div class="col-xs-7">
+                    @if (Session["Role"] != null && Session["Role"].ToString() == "Admin")
+                    {
+                        @Html.ActionLink("Users", "Index", "Users", null, new { @class = "navbar-brand" })
+                        
+                        @Html.ActionLink("Groups", "Index", "Roles", null, new { @class = "navbar-brand" })
+                        
+                        @Html.ActionLink("Permissions", "Index", "Permissions", null, new { @class = "navbar-brand" })
+                        
+                        @Html.ActionLink("Control Permissions", "Index", "ControlPermissions", null, new { @class = "navbar-brand" })
+                    }
                 </div>
                 <div class="col-xs-2">
                     @if (Session["UserId"] != null)
